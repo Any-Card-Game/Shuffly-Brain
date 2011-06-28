@@ -1,6 +1,6 @@
 ﻿//#define runExpressions
-//#define runInstructions
- #define runClass
+#define runInstructions
+// #define runClass
 //#define runClass2
 
 using System;
