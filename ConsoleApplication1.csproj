@@ -62,6 +62,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="RunGame.cs" />
+    <Compile Include="SpokeQuestion.cs" />
     <Compile Include="Util\AssureStackSplit.cs" />
     <Compile Include="BuildExpressions.cs" />
     <Compile Include="BuildFile.cs" />

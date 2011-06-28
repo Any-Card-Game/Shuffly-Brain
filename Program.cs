@@ -11,8 +11,11 @@ namespace ConsoleApplication1
 {
     class Program
     {
+        private static List<string> playersInGame = new List<string>();
+        private static string stackTrace;
+
         static void Main(string[] args)
-        { 
+        {
             string channel = "/consolepublisher";
             Console.WriteLine("Initializing...");
 
@@ -74,15 +77,71 @@ namespace ConsoleApplication1
                 },
                 OnReceive = (receiveArgs) =>
                 {
+
+
                     Payload payload = JSON.Deserialize<Payload>(receiveArgs.DataJson);
-                    Console.WriteLine("The client received data... (text: " + payload.Text + ", time: " + payload.Time + ")");
+
+
+
+
+                    Tuple<SpokeQuestion, string> vf = null;
+                    switch (payload.Type)
+                    {
+                        case SpokeMessageType.AskQuestion:
+                            return;
+                        case SpokeMessageType.JoinGame:
+                            playersInGame.Add(receiveArgs.PublishingClient.Id);
+                            if (playersInGame.Count == 1)
+                            {
+                                vf = RunGame.StartGame("sevens");
+                                stackTrace = vf.Item2;
+                            }
+                            break;
+                        case SpokeMessageType.AnswerQuestion:
+
+                            vf = RunGame.ResumeGame("sevens", stackTrace, payload.AnswerIndex);
+                            stackTrace = vf.Item2;
+                            Console.WriteLine(vf.Item1);
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
+
+                    SpokeQuestion q = vf.Item1;
+
+                    PublicationArgs fc = new PublicationArgs
+                    {
+                        Publication = new Publication
+                        {
+                            Channel = channel,
+                            DataJson = JSON.Serialize(new Payload(q.Question, q.Answers))
+                        },
+                        OnComplete = (completeArgs) =>
+                        {
+                            if (completeArgs.Publication.Successful == true)
+                            {
+                                Console.WriteLine("The publisher published to " + channel + ".");
+                            }
+                            else
+                            {
+                                Console.WriteLine("The publisher could not publish to " + channel + "... " + completeArgs.Publication.Error);
+                            }
+                        },
+                        OnException = (exceptionArgs) =>
+                        {
+                            Console.WriteLine("The publisher threw an exception... " + exceptionArgs.Exception.Message);
+                        }
+                    };
+                    publisher.Publish(fc);
+
+
+                    //       Console.WriteLine("The client received data... (text: " + payload.Text + ", time: " + payload.Time + ")");
                 }
             });
 
             Console.WriteLine();
             Console.WriteLine("Press Enter to publish text from the publisher.  Press Escape to quit.");
 
-            RunGame.rungame();
 
             while (true)
             {
@@ -98,11 +157,7 @@ namespace ConsoleApplication1
                         Publication = new Publication
                         {
                             Channel = channel,
-                            DataJson = JSON.Serialize(new Payload // custom class
-                            {
-                                Text = "Hello, world!",
-                                Time = DateTime.Now
-                            })
+                            DataJson = JSON.Serialize(new Payload())
                         },
                         OnComplete = (completeArgs) =>
                         {
@@ -132,7 +187,31 @@ namespace ConsoleApplication1
     [DataContract]
     public class Payload
     {
-        public string Text { get; set; }
-        public DateTime Time { get; set; }
+        [DataMember(Name = "Type")]
+        public SpokeMessageType Type { get; set; }
+        [DataMember(Name = "AnswerIndex")]
+        public int AnswerIndex { get; set; }
+        [DataMember(Name = "Question")]
+        public string Question { get; set; }
+        [DataMember(Name = "Answers")]
+        public string[] Answers { get; set; }
+        public Payload()
+        {
+
+        }
+
+        public Payload(string question, string[] answers) {
+            Type = SpokeMessageType.AskQuestion;
+            Question = question;
+            Answers = answers;
+
+        }
+    }
+
+    public enum SpokeMessageType : int
+    {
+        JoinGame = 0,
+        AnswerQuestion = 1,
+        AskQuestion=2
     }
 }

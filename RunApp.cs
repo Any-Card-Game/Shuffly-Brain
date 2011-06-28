@@ -12,28 +12,12 @@ using System.Linq;
 namespace ConsoleApplication1
 {
     public class RunApp
-    {
-
-        public RunApp(string fileName)
-        {
-
-
-            var b = new BuildLanguage();
-            var classes = b.Run(File.ReadAllText(fileName));
+    {  public RunApp() {
+        
+    }
 
 
-            var r = new BuildExpressions();
-            List<SpokeClass> cla = r.Run(classes.Item1, classes.Item2);
-
-            var br = new PrintExpressions(cla, false);
-            string f;
-            File.WriteAllText("C:\\spokes.txt", f = br.Run());
-            //    Console.WriteLine(f);
-
-
-        }
-
-        public RunApp(string fileName, Dictionary<string, Func<SpokeObject[], SpokeObject>> rv, Dictionary<string, SpokeType> intenMethodTypes)
+    public Tuple<SpokeQuestion, string> Begin(string fileName, Dictionary<string, Func<SpokeObject[], SpokeObject>> rv, Dictionary<string, SpokeType> intenMethodTypes, string stack , int returnIndex)
         {
             Stopwatch sw = new Stopwatch();
             // try { 
@@ -57,7 +41,7 @@ namespace ConsoleApplication1
             Console.WriteLine("Building expressions done in " + sw.ElapsedMilliseconds + " milliseconds");
 
             sw.Reset();
-             
+
 
 
 
@@ -110,9 +94,11 @@ namespace ConsoleApplication1
 #if runInstructions
             Console.WriteLine("RUNNING Instructions" + fileName.Split('.')[0] + "...");
             sw.Restart();
-            
 
-            runInstructions(ce, dfe);
+
+
+
+            return runInstructions(ce, dfe, stack, returnIndex);
             sw.Stop();
 
 
@@ -169,6 +155,7 @@ namespace ConsoleApplication1
 #if !dontwrite
             Console.ReadLine();
 #endif
+
         }
 
         private Command buildClass(Func<SpokeObject[], SpokeObject>[] rv, Tuple<SpokeMethod[], SpokeConstruct> dms)
@@ -196,17 +183,17 @@ namespace ConsoleApplication1
 
 
 
- 
 
 
 
 
-        private void runInstructions(Func<SpokeObject[], SpokeObject>[] rv, Tuple<SpokeMethod[], SpokeConstruct> dms)
+
+        private Tuple<SpokeQuestion, string> runInstructions(Func<SpokeObject[], SpokeObject>[] rv, Tuple<SpokeMethod[], SpokeConstruct> dms, string stack, int returnIndex)
         {
 
 
-            RunInstructions ri = new RunInstructions(rv, dms.Item1);
-            ri.Run(dms.Item2);
+            RunInstructions ri = new RunInstructions(rv, dms.Item1, stack, returnIndex);
+            return ri.Run(dms.Item2);
 
 
         }

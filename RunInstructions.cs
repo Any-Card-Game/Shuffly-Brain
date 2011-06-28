@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Xml;
+using System.Xml.Serialization;
 
 namespace ConsoleApplication1
 {
@@ -21,7 +23,7 @@ namespace ConsoleApplication1
         private SpokeObject FALSE = new SpokeObject(ObjectType.Bool) { BoolVal = false };
 
 
-        public RunInstructions(Func<SpokeObject[], SpokeObject>[] internalMethods, SpokeMethod[] mets)
+        public RunInstructions(Func<SpokeObject[], SpokeObject>[] internalMethods, SpokeMethod[] mets, string stack, int returnIndex)
         {
             Methods = mets;
             InternalMethods = internalMethods;
@@ -31,27 +33,51 @@ namespace ConsoleApplication1
                 ints[i] = new SpokeObject(ObjectType.Int) { IntVal = i };
             }
 
+            if (stack.Length != 0) {
+                deserialize(stack);
+                reprintStackTrace[reprintStackIndex - 1].Answer = new SpokeObject(returnIndex);
+            }
+             
+
+        }
+        private string serialize()
+        {
+            XmlSerializer sr = new XmlSerializer(typeof(List<StackTracer>));
+            StringWriter sw;
+            sr.Serialize(sw = new StringWriter(), stackTrace);
+            return sw.ToString();
+        }
+        private void deserialize(string sz)
+        {
+            XmlSerializer sr = new XmlSerializer(typeof(List<StackTracer>));
+             
 
 
+            List<StackTracer> f = (List<StackTracer>)sr.Deserialize(new StringReader(sz));
+ 
+            reprintStackTrace = f.ToArray();
+            reprintStackIndex = reprintStackTrace.Length;
         }
 
 
-
-        public void Run(SpokeConstruct so)
+        public Tuple<SpokeQuestion, string> Run(SpokeConstruct so)
         {
             var fm = Methods[so.MethodIndex];
-            SpokeObject dm = new SpokeObject() { Type = ObjectType.Object };
+            SpokeObject dm = new SpokeObject() {Type = ObjectType.Object};
             dm.Variables = new SpokeObject[so.NumOfVars];
-            for (int index = 0; index < so.NumOfVars; index++)
-            {
+            for (int index = 0; index < so.NumOfVars; index++) {
                 dm.SetVariable(index, new SpokeObject());
             }
-#if stacktrace
-            try {
-#endif
-            evaluateMethod(fm, new SpokeObject[1] { dm });
-#if stacktrace
+            try
+            {
+                evaluateMethod(fm, new SpokeObject[1] { dm });
             }
+            catch (AskQuestionException aq) {
+                return new Tuple<SpokeQuestion, string>(aq.Question,serialize());
+            }
+
+#if stacktrace
+            
             catch (Exception er) {
                 dfss.AppendLine(er.ToString());
                 File.WriteAllText("C:\\ded.txt", dfss.ToString());
@@ -59,7 +85,7 @@ namespace ConsoleApplication1
             }
 #endif
 
-
+            return null;
 
 
             // evaluate(fm, dm, new List<SpokeObject>() { dm });
@@ -72,10 +98,34 @@ namespace ConsoleApplication1
             }
             return new SpokeObject(ObjectType.Int) { IntVal = index };
         }
+        [Serializable]
+        public class StackTracer
+        { 
+            public SpokeObject[] StackObjects; 
+            public SpokeObject[] StackVariables;
+            public int InstructionIndex;
+            public int StackIndex;
+            public SpokeObject Answer;
+
+            public StackTracer(SpokeObject[] stack, SpokeObject[] variables) {
+                StackObjects = stack;
+                StackVariables = variables;
+            }
+            public StackTracer()
+            {
+            }
+        }
+        private List<StackTracer> stackTrace = new List<StackTracer>();
+        public int reprintStackIndex = -1;
+        public StackTracer[] reprintStackTrace = new StackTracer[0];
 
 #if stacktrace
         private StringBuilder dfss = new StringBuilder();
 #endif
+
+
+      
+        
         private SpokeObject evaluateMethod(SpokeMethod fm, SpokeObject[] paras)
         {
 
@@ -86,6 +136,8 @@ namespace ConsoleApplication1
                 variables[i] = paras[i];
             }
 
+
+
 #if stacktrace
             dfss.AppendLine( fm.Class.Name +" : : "+fm.MethodName+" Start");
 #endif
@@ -93,9 +145,26 @@ namespace ConsoleApplication1
             SpokeObject lastStack;
             int stackIndex = 0;
             SpokeObject[] stack = new SpokeObject[3000];
+            int index = 0;
+            StackTracer st;
+            if (reprintStackIndex == -1) {
+                stackTrace.Add(st=new StackTracer(stack,variables));
+            }
+            else {
+                StackTracer rp = reprintStackTrace[stackTrace.Count];
+                stack = rp.StackObjects;
+                variables = rp.StackVariables;
+                index = rp.InstructionIndex;
+                stackIndex = rp.StackIndex;
+                stackTrace.Add(st=new StackTracer(stack, variables));
+                if (stackTrace.Count == reprintStackIndex) {
+                    stack[stackIndex++] = rp.Answer;
+                    reprintStackIndex = -1;
+                    reprintStackTrace = null;
+                }
+            }
 
-
-            for (int index = 0; index < fm.Instructions.Length; index++)
+            for (; index < fm.Instructions.Length; index++)
             {
                 var ins = fm.Instructions[index];
 #if stacktrace
@@ -129,6 +198,8 @@ namespace ConsoleApplication1
 
                         break;
                     case SpokeInstructionType.CallMethod:
+                        st.InstructionIndex = index;
+                        st.StackIndex = stackIndex;
                         sps = new SpokeObject[ins.Index3];
                         for (int i = ins.Index3 - 1; i >= 0; i--)
                         {
@@ -137,6 +208,8 @@ namespace ConsoleApplication1
                         stack[stackIndex++] = evaluateMethod(Methods[ins.Index], sps);
                         break;
                     case SpokeInstructionType.CallMethodFunc:
+                        st.InstructionIndex = index;
+                        st.StackIndex = stackIndex;
                         sps = new SpokeObject[ins.Index3];
                         for (int i = ins.Index3 - 1; i >= 0; i--)
                         {
@@ -146,13 +219,25 @@ namespace ConsoleApplication1
                         stack[stackIndex++] = Methods[ins.Index].MethodFunc(sps);
                         break;
                     case SpokeInstructionType.CallInternal:
-
                         sps = new SpokeObject[ins.Index3];
                         for (int i = ins.Index3 - 1; i >= 0; i--)
                         {
                             sps[i] = stack[--stackIndex];
                         }
-                        stack[stackIndex++] = InternalMethods[ins.Index](sps);
+                        st.InstructionIndex = index+1;
+                        st.StackIndex = stackIndex;
+
+                        SpokeObject l = InternalMethods[ins.Index](sps);
+
+                        if (ins.Index == 16) {
+
+                            
+                            throw new AskQuestionException(stackTrace,new SpokeQuestion(sps[1].Variables[1].StringVal,sps[2].StringVal,sps[3].ArrayItems.Select(a=>a.StringVal).ToArray()));
+                        }
+                        else {
+                            stack[stackIndex++] = l;
+                        }
+
                         break;
                     case SpokeInstructionType.BreakpointInstruction:
                         Console.WriteLine("BreakPoint");
@@ -161,6 +246,7 @@ namespace ConsoleApplication1
 #if stacktrace
                         dfss.AppendLine(fm.Class.Name + " : : " + fm.MethodName + " End");
 #endif
+                        stackTrace.Remove(st);
                         return stack[--stackIndex];
                         break;
                     case SpokeInstructionType.IfTrueContinueElse:
@@ -457,11 +543,28 @@ namespace ConsoleApplication1
 
 #if stacktrace
             dfss.AppendLine(fm.Class.Name + " : : " + fm.MethodName + " End");
-#endif
-
+#endif                        
+            stackTrace.Remove(st);
             return null;
-
-
         }
     }
+
+    internal class AskQuestionException : Exception{
+        private readonly List<RunInstructions.StackTracer> myStackTrace;
+        private readonly SpokeQuestion myQuestion;
+
+        public AskQuestionException(List<RunInstructions.StackTracer> stackTrace,SpokeQuestion question) {
+            myStackTrace = stackTrace;
+            myQuestion = question;
+        }
+
+        public SpokeQuestion Question {
+            get { return myQuestion; }
+        }
+
+        public List<RunInstructions.StackTracer> StackTrace {
+            get { return myStackTrace; }
+        }
+
+     }
 }

@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Xml.Serialization;
 
 namespace ConsoleApplication1
 {
+    [Serializable]
     public class SpokeInstruction
     {
         public static List<SpokeInstruction> ins;
@@ -17,13 +19,16 @@ namespace ConsoleApplication1
             ins.Clear();
             return d;
         }
+        public SpokeInstruction() {
+            
+        }
         public SpokeInstructionType Type;
         public int Index;
         public int Index2;
         public int Index3;
-        public readonly bool BoolVal;
-        public readonly float FloatVal;
-        public string StringVal;
+        public   bool BoolVal;
+        public   float FloatVal;
+        public string StringVal; 
         public SpokeObjectMethod anonMethod;
 
         public string DEBUG;

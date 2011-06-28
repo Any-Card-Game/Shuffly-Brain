@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using System.Xml.Serialization;
 
 namespace ConsoleApplication1
 {
@@ -11,16 +12,21 @@ namespace ConsoleApplication1
         Unset, Null, Int, Float, String, Bool, Array, Object, Method,
         Void
     }
+    [Serializable]
     public class SpokeObjectMethod
     {
         public bool HasYield;
         public bool HasYieldReturn;
         public bool HasReturn;
+        [XmlIgnore]
         public SpokeLine[] Lines;
+        [XmlIgnore]
         public ParamEter[] Parameters;
         public SpokeInstruction[] Instructions;
+        [XmlIgnore]
         public SpokeVariable ReturnYield;
     }
+    [Serializable]
     public class SpokeObject
     {
         public int IntVal;
@@ -31,6 +37,7 @@ namespace ConsoleApplication1
         public SpokeObject[] Variables;
         public List<SpokeObject> ArrayItems;
         public string ClassName;
+         
         public SpokeObjectMethod AnonMethod;
         public bool ByRef;
 

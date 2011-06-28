@@ -138,12 +138,9 @@ class Main
 
 				
 				answers=[]
-				answers.add({Index=0,Text="Skip"})
-				i=1
+				answers.add("Skip")
 				sortArray(usable,dbc)=>|(card)
-					answers.add({Index=i,Text=(CardNames[card.Value]+"Of"+(CardTypes[card.Type]))})
-					i++
-				
+					answers.add(CardNames[card.Value]+"Of"+(CardTypes[card.Type]))
 
 				de=askQuestion(u,"Which card would you like to play?",answers)
 
