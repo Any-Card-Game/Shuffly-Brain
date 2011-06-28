@@ -7,13 +7,14 @@ using System.Drawing.Imaging;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using ConsoleApplication1.Game;
 
 namespace ConsoleApplication1
 {
     public class RunGame
     {
 
-        public static Tuple<SpokeQuestion, string> StartGame(string gameName, Dictionary<string, string> playersInGame)
+        public static Tuple<SpokeQuestion, string, GameBoard> StartGame(string gameName, Dictionary<string, string> playersInGame)
         {
 
 
@@ -341,7 +342,7 @@ namespace ConsoleApplication1
 
                                                                                                   foreach (var player in playersInGame         )
                                                                                                   {
-                                                                                                      a[1].AddArray(new SpokeObject(new SpokeObject[] {new SpokeObject(new List<SpokeObject>()),new SpokeObject(player.Value),}));
+                                                                                                      a[1].AddArray(new SpokeObject(new SpokeObject[] {new SpokeObject(new List<SpokeObject>()),new SpokeObject(player.Value),}, "User"));
                                                                                                                    }
                                                                                                                    return null;
                                                                                                                }
@@ -407,7 +408,7 @@ namespace ConsoleApplication1
         }
 
 
-        public static Tuple<SpokeQuestion, string> ResumeGame(string gameName, string stack, int returnIndex,Dictionary<string, string> playersInGame)
+        public static Tuple<SpokeQuestion, string, GameBoard> ResumeGame(string gameName, string stack, int returnIndex, Dictionary<string, string> playersInGame)
         {
 
 

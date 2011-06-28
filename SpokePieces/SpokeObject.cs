@@ -50,12 +50,13 @@ namespace ConsoleApplication1
             IntVal = inde;
             Type = ObjectType.Int;
         }
-        public SpokeObject(SpokeObject[] inde)
+        public SpokeObject(SpokeObject[] inde, string className)
         {
             Array.Resize(ref inde, 20);
 
             Variables = inde;
             Type = ObjectType.Object;
+            ClassName = className;
         }
         public SpokeObject(List<SpokeObject> inde)
         {

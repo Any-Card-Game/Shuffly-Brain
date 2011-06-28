@@ -5,99 +5,6 @@ using System.Threading;
 
 namespace ConsoleApplication1
 {
-    public class SpokeVariableInfo
-    {
-        public Dictionary<string, SpokeType> Variables;
-
-        public SpokeVariableInfo(SpokeVariableInfo variables)
-        {
-            if (variables == null)
-            {
-                allVariables = new List<Tuple<string, int, SpokeType>>();
-                Variables = new Dictionary<string, SpokeType>();
-                return;
-            }
-
-            allVariables = variables.allVariables;
-            index = variables.index;
-            indeces = variables.indeces;
-            Variables = new Dictionary<string, SpokeType>(variables.Variables);
-        }
-        public SpokeVariableInfo()
-        {
-            allVariables = new List<Tuple<string, int, SpokeType>>();
-            Variables = new Dictionary<string, SpokeType>();
-        }
-
-        private Dictionary<string, int> indeces = new Dictionary<string, int>();
-        public int index;
-
-
-        public List<Tuple<string, int, SpokeType>> allVariables;
-
-        public int Add(string s, SpokeType spokeType, SpokeVariable sv)
-        {
-            allVariables.Add(new Tuple<string, int, SpokeType>(s, index, spokeType));
-            Variables.Add(s, spokeType);
-            indeces.Add(s, index++);
-            if (sv != null)
-            {
-                sv.VariableIndex = indeces[s];
-            }
-
-            return index - 1;
-        }
-        public void Remove(string s)
-        {
-            Variables.Remove(s);
-            indeces.Remove(s);
-        }
-        public bool TryGetValue(string s, out SpokeType spokeType, SpokeVariable sv)
-        {
-            var def = Variables.TryGetValue(s, out spokeType);
-
-            if (def && sv != null)
-                sv.VariableIndex = indeces[s];
-
-            return def;
-        }
-
-        public SpokeType Get(string variableName, SpokeVariable mv)
-        {
-            var def = Variables[variableName];
-            if (def != null && mv != null)
-                mv.VariableIndex = indeces[variableName];
-
-            return def;
-        }
-
-        public SpokeType this[string s, SpokeVariable mv]
-        {
-            get { return Get(s, mv); }
-        }
-
-        public void IncreaseState()
-        {
-        }
-
-        public void DecreaseState()
-        {
-
-        }
-
-        public void Reset(string variableName, SpokeType spokeType, SpokeVariable sv)
-        {
-            if (Variables.ContainsKey(variableName))
-            {
-                Variables[variableName] = spokeType;
-                if (sv != null)
-                {
-                    sv.VariableIndex = indeces[variableName];
-                }
-            }
-        }
-    }
-
     public class PreparseExpressions
     {
         private List<SpokeClass> _cla;
@@ -110,6 +17,7 @@ namespace ConsoleApplication1
             _cla = cla;
             InternalMethodsTypes = internalMethods;
         }
+        public Dictionary<string, string[]> variableLookup = new Dictionary<string, string[]>();
 
         public SpokeConstruct Run(string main, string ctor)
         {
@@ -2102,7 +2010,7 @@ namespace ConsoleApplication1
 
                         rf.MethodIndex = Methods.Select(a => a.Value).ToList().IndexOf(fm);
 
-                        new SpokeInstruction(SpokeInstructionType.CreateReference, drj.Variables.Length) { DEBUG = rf.ClassName };
+                        new SpokeInstruction(SpokeInstructionType.CreateReference, drj.Variables.Length,cons.ClassName) { DEBUG = rf.ClassName };
 
                         if (fm.VariableRefs == null)
                         {
@@ -2123,7 +2031,13 @@ namespace ConsoleApplication1
 
                         foreach (var spokeItem in rf.SetVars)
                         {
-
+                            SpokeType st;
+                            if (cons.Variables.TryGetValue(spokeItem.Name, out st, null)) {
+                                spokeItem.Index = cons.Variables.Set(spokeItem.Name,
+                                                                     evaluateItem(spokeItem.Item, currentObject, variables),
+                                                                     null);
+                            }else
+                                
                             spokeItem.Index = cons.Variables.Add(spokeItem.Name,
                                                                  evaluateItem(spokeItem.Item, currentObject, variables),
                                                                  null);
@@ -2151,11 +2065,11 @@ namespace ConsoleApplication1
                     }
                     else
                     {
+                        SpokeInstruction df = new SpokeInstruction(SpokeInstructionType.CreateReference, rf.SetVars.Length) {DEBUG = "{}"};
+                        string name = "{";
+                        foreach (var spokeItem in rf.SetVars) {
+                            name += spokeItem.Name + ",";
 
-                        new SpokeInstruction(SpokeInstructionType.CreateReference, rf.SetVars.Length) { DEBUG = "{}" };
-
-                        foreach (var spokeItem in rf.SetVars)
-                        {
                             spokeItem.Index = cons.Variables.Add(spokeItem.Name,
                                                                  evaluateItem(spokeItem.Item, currentObject, variables),
                                                                  null);
@@ -2163,7 +2077,17 @@ namespace ConsoleApplication1
                             new SpokeInstruction(SpokeInstructionType.StoreToReference, spokeItem.Index);
 
                         }
+                        cons.ClassName = name.TrimEnd(',') + "}";
+                        df.StringVal = cons.ClassName;
                     }
+
+
+
+                    if (!variableLookup.ContainsKey(cons.ClassName)) {
+                        variableLookup.Add(cons.ClassName, cons.Variables.allVariables.OrderBy(a => a.Item2).Select(a => a.Item1).ToArray());
+                    }
+
+
 
                     return cons;
 

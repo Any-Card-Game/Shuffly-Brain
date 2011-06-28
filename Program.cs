@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.Serialization;
 using System.Threading;
+using ConsoleApplication1.Game;
 using FM.WebSync.Core;
 using System.Runtime.Serialization.Json;
 
@@ -84,7 +85,7 @@ namespace ConsoleApplication1
 
 
 
-                    Tuple<SpokeQuestion, string> vf = null;
+                    Tuple<SpokeQuestion, string, GameBoard> vf = null;
                     switch (payload.Type)
                     {
                         case SpokeMessageType.AskQuestion:
@@ -107,9 +108,37 @@ namespace ConsoleApplication1
                             throw new ArgumentOutOfRangeException();
                     }
                     
-                    SpokeQuestion q = vf.Item1;
+
 
                     PublicationArgs fc = new PublicationArgs
+                    {
+                        Publication = new Publication
+                        {
+                            Channel = channel ,
+                            DataJson = JSON.Serialize(vf.Item3)
+                        },
+                        OnComplete = (completeArgs) =>
+                        {
+                            if (completeArgs.Publication.Successful == true)
+                            {
+                                Console.WriteLine("The publisher published to " + channel + ".");
+                            }
+                            else
+                            {
+                                Console.WriteLine("The publisher could not publish to " + channel + "... " + completeArgs.Publication.Error);
+                            }
+                        },
+                        OnException = (exceptionArgs) =>
+                        {
+                            Console.WriteLine("The publisher threw an exception... " + exceptionArgs.Exception.Message);
+                        }
+                    };
+                    publisher.Publish(fc);
+
+
+                    SpokeQuestion q = vf.Item1;
+
+                     fc = new PublicationArgs
                     {
                         Publication = new Publication
                         {

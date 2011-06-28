@@ -1,17 +1,20 @@
 ﻿//#define stacktrace
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
+using ConsoleApplication1.Game;
 
 namespace ConsoleApplication1
 {
     public class RunInstructions
     {
         private SpokeMethod[] Methods;
+        private readonly Dictionary<string, string[]> myVariableLookup;
         private Func<SpokeObject[], SpokeObject>[] InternalMethods;
 
 
@@ -22,10 +25,15 @@ namespace ConsoleApplication1
         private SpokeObject TRUE = new SpokeObject(ObjectType.Bool) { BoolVal = true };
         private SpokeObject FALSE = new SpokeObject(ObjectType.Bool) { BoolVal = false };
 
+        public SpokeObject getVariableByName(SpokeObject so, string name)
+        {
+            return so.Variables[Array.IndexOf(myVariableLookup[so.ClassName], name)];
+        }
 
-        public RunInstructions(Func<SpokeObject[], SpokeObject>[] internalMethods, SpokeMethod[] mets, string stack, int returnIndex)
+        public RunInstructions(Func<SpokeObject[], SpokeObject>[] internalMethods, SpokeMethod[] mets, string stack, int returnIndex, Dictionary<string, string[]> variableLookup)
         {
             Methods = mets;
+            myVariableLookup = variableLookup;
             InternalMethods = internalMethods;
             ints = new SpokeObject[100];
             for (int i = 0; i < 100; i++)
@@ -33,11 +41,12 @@ namespace ConsoleApplication1
                 ints[i] = new SpokeObject(ObjectType.Int) { IntVal = i };
             }
 
-            if (stack.Length != 0) {
+            if (stack.Length != 0)
+            {
                 deserialize(stack);
                 reprintStackTrace[reprintStackIndex - 1].Answer = new SpokeObject(returnIndex);
             }
-             
+
 
         }
         private string serialize()
@@ -50,30 +59,32 @@ namespace ConsoleApplication1
         private void deserialize(string sz)
         {
             XmlSerializer sr = new XmlSerializer(typeof(List<StackTracer>));
-             
+
 
 
             List<StackTracer> f = (List<StackTracer>)sr.Deserialize(new StringReader(sz));
- 
+
             reprintStackTrace = f.ToArray();
             reprintStackIndex = reprintStackTrace.Length;
         }
 
 
-        public Tuple<SpokeQuestion, string> Run(SpokeConstruct so)
+        public Tuple<SpokeQuestion, string, GameBoard> Run(SpokeConstruct so)
         {
             var fm = Methods[so.MethodIndex];
-            SpokeObject dm = new SpokeObject() {Type = ObjectType.Object};
+            SpokeObject dm = new SpokeObject() { Type = ObjectType.Object };
             dm.Variables = new SpokeObject[so.NumOfVars];
-            for (int index = 0; index < so.NumOfVars; index++) {
+            for (int index = 0; index < so.NumOfVars; index++)
+            {
                 dm.SetVariable(index, new SpokeObject());
             }
             try
             {
                 evaluateMethod(fm, new SpokeObject[1] { dm });
             }
-            catch (AskQuestionException aq) {
-                return new Tuple<SpokeQuestion, string>(aq.Question,serialize());
+            catch (AskQuestionException aq)
+            {
+                return new Tuple<SpokeQuestion, string, GameBoard>(aq.Question, serialize(), aq.GameBoard);
             }
 
 #if stacktrace
@@ -100,14 +111,15 @@ namespace ConsoleApplication1
         }
         [Serializable]
         public class StackTracer
-        { 
-            public SpokeObject[] StackObjects; 
+        {
+            public SpokeObject[] StackObjects;
             public SpokeObject[] StackVariables;
             public int InstructionIndex;
             public int StackIndex;
             public SpokeObject Answer;
 
-            public StackTracer(SpokeObject[] stack, SpokeObject[] variables) {
+            public StackTracer(SpokeObject[] stack, SpokeObject[] variables)
+            {
                 StackObjects = stack;
                 StackVariables = variables;
             }
@@ -124,8 +136,8 @@ namespace ConsoleApplication1
 #endif
 
 
-      
-        
+
+
         private SpokeObject evaluateMethod(SpokeMethod fm, SpokeObject[] paras)
         {
 
@@ -147,17 +159,20 @@ namespace ConsoleApplication1
             SpokeObject[] stack = new SpokeObject[3000];
             int index = 0;
             StackTracer st;
-            if (reprintStackIndex == -1) {
-                stackTrace.Add(st=new StackTracer(stack,variables));
+            if (reprintStackIndex == -1)
+            {
+                stackTrace.Add(st = new StackTracer(stack, variables));
             }
-            else {
+            else
+            {
                 StackTracer rp = reprintStackTrace[stackTrace.Count];
                 stack = rp.StackObjects;
                 variables = rp.StackVariables;
                 index = rp.InstructionIndex;
                 stackIndex = rp.StackIndex;
-                stackTrace.Add(st=new StackTracer(stack, variables));
-                if (stackTrace.Count == reprintStackIndex) {
+                stackTrace.Add(st = new StackTracer(stack, variables));
+                if (stackTrace.Count == reprintStackIndex)
+                {
                     stack[stackIndex++] = rp.Answer;
                     reprintStackIndex = -1;
                     reprintStackTrace = null;
@@ -169,15 +184,15 @@ namespace ConsoleApplication1
                 var ins = fm.Instructions[index];
 #if stacktrace
                 dfss.AppendLine(stackIndex + " ::  " + ins.ToString());
-#endif 
+#endif
 
                 SpokeObject[] sps;
-                
+
                 SpokeObject bm;
                 switch (ins.Type)
                 {
                     case SpokeInstructionType.CreateReference:
-                        stack[stackIndex++] = new SpokeObject(new SpokeObject[ins.Index]);
+                        stack[stackIndex++] = new SpokeObject(new SpokeObject[ins.Index], ins.StringVal);
                         break;
                     case SpokeInstructionType.CreateArray:
                         stack[stackIndex++] = new SpokeObject(new List<SpokeObject>(20));
@@ -189,12 +204,12 @@ namespace ConsoleApplication1
                         //   throw new NotImplementedException("");
                         break;
                     case SpokeInstructionType.Goto:
-                       
+
                         index = ins.Index;
 
                         break;
                     case SpokeInstructionType.Comment:
-                        
+
 
                         break;
                     case SpokeInstructionType.CallMethod:
@@ -224,17 +239,22 @@ namespace ConsoleApplication1
                         {
                             sps[i] = stack[--stackIndex];
                         }
-                        st.InstructionIndex = index+1;
+                        st.InstructionIndex = index + 1;
                         st.StackIndex = stackIndex;
 
                         SpokeObject l = InternalMethods[ins.Index](sps);
 
-                        if (ins.Index == 16) {
+                        if (ins.Index == 16)
+                        {
+                            GameBoard d = buildBoard(sps[4]);
 
-                            
-                            throw new AskQuestionException(stackTrace,new SpokeQuestion(sps[1].Variables[1].StringVal,sps[2].StringVal,sps[3].ArrayItems.Select(a=>a.StringVal).ToArray()));
+
+                            throw new AskQuestionException(stackTrace,
+                                                           new SpokeQuestion(sps[1].Variables[1].StringVal, sps[2].StringVal,
+                                                                             sps[3].ArrayItems.Select(a => a.StringVal).ToArray()), d);
                         }
-                        else {
+                        else
+                        {
                             stack[stackIndex++] = l;
                         }
 
@@ -351,7 +371,7 @@ namespace ConsoleApplication1
                         stackIndex--;
                         break;
                     case SpokeInstructionType.Not:
-                        stack[stackIndex-1] = stack[stackIndex-1].BoolVal ? FALSE : TRUE;
+                        stack[stackIndex - 1] = stack[stackIndex - 1].BoolVal ? FALSE : TRUE;
                         break;
                     case SpokeInstructionType.AddStringInt:
                         stack[stackIndex - 2] = new SpokeObject(ObjectType.String) { StringVal = stack[stackIndex - 2].StringVal + stack[stackIndex - 1].IntVal };
@@ -543,28 +563,105 @@ namespace ConsoleApplication1
 
 #if stacktrace
             dfss.AppendLine(fm.Class.Name + " : : " + fm.MethodName + " End");
-#endif                        
+#endif
             stackTrace.Remove(st);
             return null;
         }
-    }
 
-    internal class AskQuestionException : Exception{
-        private readonly List<RunInstructions.StackTracer> myStackTrace;
-        private readonly SpokeQuestion myQuestion;
+        private GameBoard buildBoard(SpokeObject spokeObject)
+        {
+            GameBoard gb = new GameBoard();
 
-        public AskQuestionException(List<RunInstructions.StackTracer> stackTrace,SpokeQuestion question) {
-            myStackTrace = stackTrace;
-            myQuestion = question;
+            var mainArea = getVariableByName(spokeObject, "mainArea");
+            var userAreas = getVariableByName(spokeObject, "userAreas");
+
+
+            gb.MainArea = buildArea(mainArea);
+            gb.UserAreas=new List<TableArea>();
+            foreach (var area in userAreas.ArrayItems)
+            {
+                gb.UserAreas.Add(buildArea(area));
+
+            }
+
+            return gb;
         }
 
-        public SpokeQuestion Question {
+        private TableArea buildArea(SpokeObject mainArea)
+        {
+            var tca = new TableArea();
+            tca.Dimensions = getRect(getVariableByName(mainArea, "dimensions"));
+            tca.NumberOfCardsHorizontal = getVariableByName(mainArea, "numberOfCardsHorizontal").IntVal;
+            tca.NumberOfCardsVertical = getVariableByName(mainArea, "numberOfCardsVertical").IntVal;
+            tca.Spaces = new List<TableSpace>();
+            tca.TextAreas = new List<TableTextArea>();
+
+            foreach (var space in getVariableByName(mainArea, "spaces").ArrayItems)
+            {
+                TableSpace ts;
+                tca.Spaces.Add(ts = new TableSpace());
+                ts.Visible = getVariableByName(space, "visible").BoolVal;
+                ts.Width = getVariableByName(space, "width").IntVal;
+                ts.Height = getVariableByName(space, "height").IntVal;
+                ts.X = getVariableByName(space, "xPosition").IntVal;
+                ts.Y = getVariableByName(space, "yPosition").IntVal;
+                ts.DrawCardsBent = getVariableByName(space, "drawCardsBent").BoolVal;
+                ts.Name = getVariableByName(space, "name").StringVal;
+                ts.StackCards = getVariableByName(space, "stackCards").BoolVal;
+                ts.Cards = new List<Card>();
+                foreach (var card in getVariableByName(space, "pile").ArrayItems)
+                    ts.Cards.Add(new Card(getVariableByName(card, "Value").IntVal, getVariableByName(card, "Type").IntVal));
+            }
+
+
+            foreach (var textarea in getVariableByName(mainArea, "textAreas").ArrayItems)
+            {
+                TableTextArea ta;
+                tca.TextAreas.Add(ta = new TableTextArea());
+                ta.Name = getVariableByName(textarea, "name").StringVal;
+                ta.RotateAngle = getVariableByName(textarea, "rotateAngle").IntVal;
+                ta.Text = getVariableByName(textarea, "text").StringVal;
+                ta.X = getVariableByName(textarea, "xPosition").IntVal;
+                ta.Y = getVariableByName(textarea, "yPosition").IntVal;
+
+            }
+            return tca;
+        }
+
+        public Rectangle getRect(SpokeObject so)
+        {
+            return new Rectangle(getVariableByName(so, "x").IntVal, getVariableByName(so, "y").IntVal, getVariableByName(so, "width").IntVal, getVariableByName(so, "height").IntVal);
+        }
+
+    }
+
+    internal class AskQuestionException : Exception
+    {
+        private readonly List<RunInstructions.StackTracer> myStackTrace;
+        private readonly SpokeQuestion myQuestion;
+        private readonly GameBoard myGameBoard;
+
+        public AskQuestionException(List<RunInstructions.StackTracer> stackTrace, SpokeQuestion question, GameBoard gameBoard)
+        {
+            myStackTrace = stackTrace;
+            myQuestion = question;
+            myGameBoard = gameBoard;
+        }
+
+        public GameBoard GameBoard
+        {
+            get { return myGameBoard; }
+        }
+
+        public SpokeQuestion Question
+        {
             get { return myQuestion; }
         }
 
-        public List<RunInstructions.StackTracer> StackTrace {
+        public List<RunInstructions.StackTracer> StackTrace
+        {
             get { return myStackTrace; }
         }
 
-     }
+    }
 }

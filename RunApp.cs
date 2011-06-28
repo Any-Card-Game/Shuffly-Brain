@@ -8,21 +8,24 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using ConsoleApplication1.Game;
 
 namespace ConsoleApplication1
 {
     public class RunApp
-    {  public RunApp() {
-        
-    }
-
-
-    public Tuple<SpokeQuestion, string> Begin(string fileName, Dictionary<string, Func<SpokeObject[], SpokeObject>> rv, Dictionary<string, SpokeType> intenMethodTypes, string stack , int returnIndex)
+    {
+        public RunApp()
         {
-        CompiledApp cp;
-        if (CompiledApps.TryGetValue(fileName, out cp)) {
-            return runInstructions(cp.Ce, cp.Dfe, stack, returnIndex);
         }
+
+
+        public Tuple<SpokeQuestion, string, GameBoard> Begin(string fileName, Dictionary<string, Func<SpokeObject[], SpokeObject>> rv, Dictionary<string, SpokeType> intenMethodTypes, string stack, int returnIndex)
+        {
+            CompiledApp cp;
+            if (CompiledApps.TryGetValue(fileName, out cp))
+            {
+                return runInstructions(cp.Ce, cp.Dfe, stack, returnIndex);
+            }
 
 
             Stopwatch sw = new Stopwatch();
@@ -53,7 +56,7 @@ namespace ConsoleApplication1
 
             Console.WriteLine("Preparsing expressions...");
             sw.Restart();
-            Tuple<SpokeMethod[], SpokeConstruct> dfe = preparse(intenMethodTypes, cla);
+            Tuple<SpokeMethod[], SpokeConstruct, Dictionary<string, string[]>> dfe = preparse(intenMethodTypes, cla);
             sw.Stop();
             Console.WriteLine("Preparsing expressions done in " + sw.ElapsedMilliseconds + " milliseconds");
             sw.Reset();
@@ -101,10 +104,10 @@ namespace ConsoleApplication1
             Console.WriteLine("RUNNING Instructions" + fileName.Split('.')[0] + "...");
             sw.Restart();
 
-        var Saver = new CompiledApp(ce, dfe);
-        CompiledApps.Add(fileName,Saver);
+            var Saver = new CompiledApp(ce, dfe);
+            CompiledApps.Add(fileName, Saver);
 
-        return runInstructions(ce, dfe, stack, returnIndex);
+            return runInstructions(ce, dfe, stack, returnIndex);
             sw.Stop();
 
 
@@ -187,14 +190,14 @@ namespace ConsoleApplication1
 #endif
 
 
-        private static Dictionary<string, CompiledApp> CompiledApps=new Dictionary<string, CompiledApp>();
+        private static Dictionary<string, CompiledApp> CompiledApps = new Dictionary<string, CompiledApp>();
 
 
-        private Tuple<SpokeQuestion, string> runInstructions(Func<SpokeObject[], SpokeObject>[] rv, Tuple<SpokeMethod[], SpokeConstruct> dms, string stack, int returnIndex)
+        private Tuple<SpokeQuestion, string, GameBoard> runInstructions(Func<SpokeObject[], SpokeObject>[] rv, Tuple<SpokeMethod[], SpokeConstruct, Dictionary<string, string[]>> dms, string stack, int returnIndex)
         {
 
 
-            RunInstructions ri = new RunInstructions(rv, dms.Item1,stack,returnIndex);
+            RunInstructions ri = new RunInstructions(rv, dms.Item1, stack, returnIndex,dms.Item3);
             return ri.Run(dms.Item2);
 
 
@@ -215,24 +218,26 @@ namespace ConsoleApplication1
 
 
 
-        public Tuple<SpokeMethod[], SpokeConstruct> preparse(Dictionary<string, SpokeType> rv, List<SpokeClass> cla)
+        public Tuple<SpokeMethod[], SpokeConstruct, Dictionary<string, string[]>> preparse(Dictionary<string, SpokeType> rv, List<SpokeClass> cla)
         {
             Dictionary<string, SpokeMethod> dms =
                 cla.SelectMany(a => a.Methods).ToDictionary(a => a.Class.Name + a.MethodName);
             var m = new PreparseExpressions(cla, rv, dms);
 
             var d = m.Run("Main", ".ctor");
-            return new Tuple<SpokeMethod[], SpokeConstruct>(dms.Select(a => a.Value).ToArray(), d);
+            return new Tuple<SpokeMethod[], SpokeConstruct, Dictionary<string, string[]>>(dms.Select(a => a.Value).ToArray(), d, m.variableLookup);
         }
 
 
     }
 
-    public class CompiledApp{
+    public class CompiledApp
+    {
         public Func<SpokeObject[], SpokeObject>[] Ce { get; set; }
-        public Tuple<SpokeMethod[], SpokeConstruct> Dfe { get; set; }
+        public Tuple<SpokeMethod[], SpokeConstruct, Dictionary<string, string[]>> Dfe { get; set; }
 
-        public CompiledApp(Func<SpokeObject[], SpokeObject>[] ce, Tuple<SpokeMethod[], SpokeConstruct> dfe) {
+        public CompiledApp(Func<SpokeObject[], SpokeObject>[] ce, Tuple<SpokeMethod[], SpokeConstruct, Dictionary<string, string[]>> dfe)
+        {
             Ce = ce;
             Dfe = dfe;
         }

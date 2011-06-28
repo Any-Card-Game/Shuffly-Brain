@@ -61,8 +61,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Game\Card.cs" />
+    <Compile Include="Game\GameBoard.cs" />
+    <Compile Include="Game\TableArea.cs" />
+    <Compile Include="Game\TableSpace.cs" />
+    <Compile Include="Game\TableTextArea.cs" />
     <Compile Include="RunGame.cs" />
     <Compile Include="SpokeQuestion.cs" />
+    <Compile Include="SpokePieces\SpokeVariableInfo.cs" />
     <Compile Include="Util\AssureStackSplit.cs" />
     <Compile Include="BuildExpressions.cs" />
     <Compile Include="BuildFile.cs" />

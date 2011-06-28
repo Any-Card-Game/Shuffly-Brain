@@ -82,6 +82,12 @@ namespace ConsoleApplication1
 
         }
 
+        public SpokeInstruction(SpokeInstructionType getLocal, int i, string className)
+            : this(getLocal)
+        {
+            Index = i;
+            StringVal = className;
+        }
         public string gotoGuy;
         public string labelGuy;
 

@@ -43,7 +43,7 @@ namespace ConsoleApplication1
 
         public SpokeObject Run()
         {
-            SpokeObject dm = new SpokeObject(new SpokeObject[9]);
+            SpokeObject dm = new SpokeObject(new SpokeObject[9], "");
             var gm = new SpokeObject[9];
             gm[0] = dm;
             return Mainctor(gm);
