@@ -2,16 +2,17 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Runtime.Serialization;
 using System.Threading;
 using FM.WebSync.Core;
-
+using System.Runtime.Serialization.Json;
 
 namespace ConsoleApplication1
 {
     class Program
     {
         static void Main(string[] args)
-        {
+        { 
             string channel = "/consolepublisher";
             Console.WriteLine("Initializing...");
 
@@ -127,7 +128,9 @@ namespace ConsoleApplication1
         }
     }
 
-    internal class Payload{
+    [DataContract]
+    public class Payload
+    {
         public string Text { get; set; }
         public DateTime Time { get; set; }
     }
