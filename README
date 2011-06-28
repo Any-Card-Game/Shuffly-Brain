@@ -1,1 +1,344 @@
-Spoke language
+Any Card Game
+codename
+Shuff.ly
+                        As described by Dested
+
+
+
+
+Synopsis
+“Any Card Game” is a way for users to easily join and play the largest variety of card games accessible anywhere in the richest way possible. The content of the site is 100% developer driven, and to that end developer reap the rewards of their creation. This will allow for deep competition between developers to be the first to market with their favorite games, which will lead to a rich user experience.
+
+
+
+
+
+
+
+
+ Information
+
+
+1. Web Front End  (The Game)
+1. Javascript?
+2. Extremely lightweight in appearance.
+1. Floating windows above a constantly running gameboard 
+1. (see image warning: ugly)
+1. Developer Front End
+1. Javascript?
+2. Support for pushing code to the test server to compile
+1. Compilations will be queued and returned results when finished.
+1. Allow to test run the game against our Test server. 
+1. Allow for developer step through code and simulate player responses
+1. Submit a game to be released to Beta
+1. Still reviewed for terrible things
+2. Allow users to click into a beta area to see and play beta game
+1. Move game to release mode 
+1. Supports ad profit sharing
+1. Percentage? Im thinking 35%?
+1. Monitoring of the released games, being able to see play percentages, bounce rate, ad money, bug reports?, and upload custom card images
+1. Web Server Backend 
+1. There will need to be a webserver almost certainly to track the developer side of things, including profit sharing and monitoring of statistics.
+1. Im thinknig asp.net, potentially asp.net MVC but ive never personally used it. I just know for a fact its wonderful.
+1. Is there need for a web server for the front end?
+1. “Brain” Back End
+1. Lightweight custom Long Polling type server to allow for constant easy communication between clients and brain.
+2. The brain will also be responsible for compiling the Spoke language and running its virtual machine. 
+1. Running of the spoke games can happen in a few ways, each with their own gains and losses
+1. Run each game on their own thread, and “pause” the thread when waiting for a user to answer a “question”
+2. Save the entire current state of the game on question request to be loaded up and some how resumed on player response.
+1. Doing it this way may be space costly but could open the door to different kinds of games, for instance those that take place over long periods of time
+1. Spoke Language
+1. The specification can be found here.
+2. The language will come with a card game framework to allow for easy game making, as described here.
+1. Card Games
+1. The first thing the developer should do is instantiate the CardGame object with the number of cards the game will be played with, and the number of jokers. 
+1. The number of cards can only be a multiple of 52 currently
+1. The CardGame object will contain all the users playing in the game and the cards they hold, along with all of the Piles being used in the game and the Table objects for drawing purposes.
+2. From there he is allowed to manipulate the deck however he decides, normally calling the shuffle method, and then “dealing” the appropriate cards to the appropriate players in the appropriate way.
+3. Most games then enter into a loop that is only broken when the game is finished, as normally the logic for card games is something like loop through each player forever until some condition is met.
+4. In this loop the developer will do things like pose players questions as to how he would like to progress the game, be it move a card from one pile to another(ex. discarding) , or simply ask a question pertaining to logic (go fish?) 
+1. When these questions are asked the game is halted until the player has answered. There are configuration settings that can define the maximum wait time.
+2. You can also define a question to be posed to more than one player, and even different possible answers for each player. The separate responses can then be looped through and handled accordingly.
+
+
+
+
+
+
+
+Spoke Specification 
+1. Structure
+1. Code is structured in a strict tabbed format 
+1. Classes and Enums are always at tab index 0
+2. Methods defintions are always at tab index 1 and method content are always at tab index 2
+3. Code blocks are denoted by increased tab index
+1. if variable.IsGood==false
+                print(“Bad”)
+        else
+                print(“Good”)
+1. Keywords
+1. def,class,create,switch,enum,return,static,this,if,else,false,true
+1. Operators
+1. Arithmetic
+1. + - / * % ^ 
+1. Logical
+1. && || !
+1. Increment, Decrement 
+1. ++ --
+1. Relational 
+1. == != < > <= >=
+1. Assignment
+1. = += -= *= /=
+1. Field access 
+1. .
+1. Anonymous method
+1. =>
+1. Indexing arrays
+1. [ ]
+1. Ternary conditional
+1.  bool?val1:val2
+1. Both values must be of equal type
+1. Object creation
+1. create
+1. Literals
+1. float
+1. 1.4,-402.4234
+1. int
+1. 1,5,80,-120
+1. string
+1. “this is a string”    ,   ” \\ will only show one backslash”
+1. bool
+1. true,false
+1. Arrays
+1. Arrays are instantiated by simply using [] and can contain any number of values as long as they are of the same type
+1. a=[]
+2. a=[1,3,5,8]
+3. a=[create {X=5,Y=10},create {X=12,Y=15}]
+1. Arrays have a full list of methods to allow manipulation, some of which have compiler instruction calls tied to them (Add, Remove, GetElement, SetElement)
+1. Classes
+1. Classes have a case sensitive name 
+1. class ClassName
+1. They are made up of Fields and Methods
+1. Fields are defined simply as name=value, and must be assigned a default value
+1. Foo=create Bar()
+2. Amount=0.0
+1. Methods are defined as def name(paramaters)
+1. def Foobar(foo,bar)
+print(foo)
+print(bar)
+1. Static methods have type information along with them
+1. def static Foobar(int foo,int bar)
+1. Methods are not polymorphic
+1. Objects
+1. An object can be a predefined class with methods and fields, or defined at time of use with only fields. Class instantiation can also take any number of parameters defined in the constructor.
+1. create Foobar(15)   ,   create {Foo=6,Bar=9}
+1. Objects are considered of the same type so long as they contain the same field thumbprint (defined as type and name)
+2. An object can be set to null, but an object cannot be set to null initially.
+1. To set an object to null while still defining the type use 
+1. type Foobar  ,  type {Foo=type int, Bar=type int}
+1. Only objects of the same type can be compared 
+1. if create {X=5,Y=12}==create {X=5,Y=11} # will compile
+2. if create {X=5,Y=12}==create {X=5,Y=11,Z=12} # will not compile
+1. Methods
+1. Methods can be called on an object using dot notation. Inside of methods the developer is allowed to use the special variable this to denote the current object.
+1. variable.someMethod(6) 
+2. this.someMethod(6)
+3. someMethod(6)  # from within the same class
+1. Static methods do not allow this and are called by using the class name
+1. Foobar.someMethod(6)
+1. Variables
+1. Variable Naming
+1. Case Sensitive
+2. Cannot start with number
+3. Cannot be keywords
+1. Variables types are defined at the time of instantiation, its type cannot change through the lifetime of the application
+1. Types
+1. int, float,bool,array, an object
+1. Variable types only need to be defined in the the header of static methods, they are assumed by declaration after that point
+1. Anonymous Methods
+1. Anonymous methods are denoted using =>, parameters are only used when neccecary 
+1. variable => |(parameter1,parameter2)
+                                # CodeBlock
+1. They are used for loops as well as passing around chunks of code.
+1. Loop
+1. Loops can be triggered on by either a boolean conditional (traditional while loop), or an array (traditionally foreach loop)
+2. [1,2,4,6]=>|(value)
+                print(value) # 1 2 4 6
+
+
+1. [1,2,4,6]=>|(value,index)
+                print(index) # 0 1 2 3
+print(value) # 1 2 4 6
+
+
+1. (true)=>
+        print(“Hello World”) # will print forever
+
+
+1. [1,2,4,6]=>variable  #  where variable is an anonymous                                    #  method with         thethumbprint of one or                                    #  two int parameters
+2. They can be set to variables. When doing this they maintain the variable scope in which they were declared.
+1. variable = |(value,index)=>
+        print(value)
+        print(index)
+1. Conditional structures
+1. If statement (with optional else and else if)
+1. if i==3
+        # code block
+else if i==5
+        # code block
+else 
+        # code block
+1. Ternary
+1. variable =  (i==3)?12:19
+1. Switch structures
+1. switched on variables can be of any type.
+2. fall through is not allowed unless the codeblock is empty
+3. switch (variable)
+        case 1:
+                #code block
+        case 2:
+                #code block
+        case 3:
+        case 4:
+                #code block        
+1. Enums
+1. Enum items can be set to a value of any type
+1. Enum Priority
+                High=1
+                Medium=2
+                Low=3
+
+
+Library definition 
+
+
+Package SpokeLibrary
+
+
+Class Rectangle
+        int x
+        int y
+        int width
+        int height
+
+
+Class Randomizer
+        (int seed)
+        int next()
+        int nextBetween(int left,int right)
+
+
+Class Math
+        float pi
+        float sin(float s)
+        float cos(float s)
+        float tan(float s)
+
+
+Class Array
+void add(Any object)
+void addRange(Any[] objects)
+void remove(Any object)
+bool contains(Any object)
+int length()
+Any elementAt(int index)
+void setElement(int index,Any object)
+int indexOf(Any object)
+void clear()
+
+
+Enum Order
+        NoOrder,Ascending,Descending
+
+
+
+
+Package ACGFramework
+
+
+Class CardGame
+        (int numberOfCards, int numberOfJokers)
+        User[] users
+        Pile[] piles
+        Pile deck
+        TableArea mainArea
+        TableArea[] userAreas
+        void dealCards(int numberOfCards,CardState state)
+
+
+Class User
+        string userName
+        int playerDealingOrder
+        Card[] cards
+
+
+Class Pile
+        Card[] cards
+        void shuffle()
+
+
+Class Card
+        int value
+        CardType type
+        bool faceUp
+        CardState state
+        String getFullName()
+        String getValueName()
+        String getTypeName()
+
+
+Enum CardState
+        FaceUp,FaceDown,FaceUpIfOwned
+
+
+Enum CardType
+        Heart,Diamond,Spade,Club
+
+
+Class PokerRules 
+        PokerResult[] evaluatePoker(Cards[] cards)
+
+
+Class PokerResult
+        Card[] cards
+        PokerWinType type
+        int weight
+
+
+Enum PokerWinType
+        Straight,Flush,Pair,ThreeOfAKind,FourOfAKind,StraightFlush
+        
+
+
+Package LayoutFramework
+
+
+Class TableArea
+        int numberOfCardsHorizontal
+        int numberOfCardsVertical
+        Rectangle dimensions
+        TableSpace[] spaces
+        TableTextArea[] textAreas
+
+
+Class TableSpace
+        bool visible
+        bool stackCards
+        bool drawCardsBent
+        string name
+        string areaName
+        int xPosition
+        int yPosition
+        int width
+        int height
+        Order sortOrder
+
+
+Class TableTextArea
+        string name
+        string areaName
+        int xPosition
+        int yPosition
+        int rotateAngle
+        string text
