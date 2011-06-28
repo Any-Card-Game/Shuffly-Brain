@@ -67,9 +67,8 @@ class Main
 	diamonds=[{Value=0,Type=0}]
 	dbc={}	
 	
-	CardTypes=[]
-	CardNames=[]
 	
+	cardgame=create CardGame()
 
 	def ()
 
@@ -77,12 +76,6 @@ class Main
 		clubs.clear()
 		hearts.clear()
 		diamonds.clear()
-
-		
-
-		writeLine(false?1:2,"2")
-		writeLine(true?1:2,"1")
-		
 
 		dbc=|(left,right)=>
 			return left.Value>right.Value
@@ -102,60 +95,28 @@ class Main
 			d=vafb[indes]
 			vafb[indes]=vafb[vm]
 			indes++
-			vafb[vm]=d 
-
-		write("|")
-		write(vafb)
-		write("|")
+			vafb[vm]=d
 
 		return vafb
 
 	def runGame()
-		users=[{Name="A",Cards=[]},{Name="B",Cards=[]},{Name="C",Cards=[]},{Name="D",Cards=[]},{Name="E",Cards=[]}]
-		 
-
-$		debug(users[0])
-		deck=[]
-
-		[1>>4]=>|(am)
-			[1>>13]=>|(ab)
-				deck.add({Value=ab,Type=am})
-
-$		debug(deck)
 		
 
 		[1>>20]=>
-			write(deck)
-			write(" Shuff")
-			deck=shuffle(deck)
-			write(deck)
-			
+			cardgame.deck=shuffle(cardgame.deck)
 
-
-		(deck.length()>0)=>
-			users=>|(u)
-				if deck.length()>0
-					u.Cards.add(deck[0])
-					deck.remove(deck[0])
+		(cardgame.deck.length()>0)=>
+			cardgame.users=>|(u)
+				if cardgame.deck.length()>0
+					u.Cards.add(cardgame.deck[0])
+					cardgame.deck.remove(cardgame.deck[0])
 		 
-$		users=>|(u)
-$			writeLine("User:",u.Name)
-$			u.Cards=>|(c)
-$				writeLine("  ",c.Type,c.Value)
-
-		
 		CardTypes=["","Hearts","Clubs","Diamonds","Spades"]
 		CardNames=["","Ace","Deuce","Three","Four","Five","Six","Seven","Eight","Nine","Ten","Jack","Queen","King"]
-
+	
 
 		(1<2)=>
-			users=>|(u) 
-				clearConsole()
-				drawHand(u)
-				 
-$				usable=[u.Cards{_.Type==4 && (_.Value==7 || spades<__.Value==_.Value+1 || __.Value=_.Value-1>!=Null},u.Cards{_.Type==2 && (_.Value==7 || clubs<__.Value==_.Value+1 || __.Value=_.Value-1>!=Null},u.Cards{_.Type==1 && (_.Value==7 || hearts<__.Value==_.Value+1 || __.Value=_.Value-1>!=Null},u.Cards{_.Type==4 && (_.Value==3 || diamonds<__.Value==_.Value+1 || __.Value=_.Value-1>!=Null}]
-
-
+			cardgame.users=>|(u)
 				usable=[u.Cards{|(_)=>
 					return _.Type==4 && (_.Value==7 || spades<|(__)=> 
 						return __.Value==_.Value+1 || __ .Value==_.Value-1
@@ -173,155 +134,43 @@ $				usable=[u.Cards{_.Type==4 && (_.Value==7 || spades<__.Value==_.Value+1 || _
 						return __.Value==_.Value+1 || __ .Value==_.Value-1
 					>!=null)
 				}]
-				 
-$ old
-
-$				usable=[u.Cards=>|(_)
-$					if _.Type==4 && (_.Value==7 || spades=>|(__)
-$						if __.Value==_.Value+1 || __.Value==_.Value-1
-$							return __
-$					!=NULL)
-$						yield return _
-$				,u.Cards=>|(_)
-$					if _.Type==2 && (_.Value==7 || clubs=>|(__)
-$						if __.Value==_.Value+1 || __.Value==_.Value-1
-$							return __
-$					!=NULL)
-$						yield return _
-$				,u.Cards=>|(_)
-$					if _.Type==1 && (_.Value==7 || hearts=>|(__)
-$						if __.Value==_.Value+1 || __.Value==_.Value-1
-$							return __
-$					!=NULL)
-$						yield return _
-$				,u.Cards=>|(_)
-$					if _.Type==3 && (_.Value==7 || diamonds=>|(__)
-$						if __.Value==_.Value+1 || __.Value==_.Value-1
-$							return __
-$					!=NULL)
-$						yield return _
-$				]
-$
-
-
-
-				i=0
-				draw()
-				setConsolePosition(0,3)
-				writeLine("Which card would you like to play?")
-				writeLine("   ",0,":","Skip")
-				i=1
-
-
 
 
 				
-
+				answers=[]
+				answers.add({Index=0,Text="Skip"})
+				i=1
 				sortArray(usable,dbc)=>|(card)
-					writeLine("   ",i,":",CardNames[card.Value],"Of",CardTypes[card.Type])
+					answers.add({Index=i,Text=(CardNames[card.Value]+"Of"+(CardTypes[card.Type]))})
 					i++
 				
-				rfe=""
-$ 				rfe=readLine()
 
-				de=0
-				if rfe==""
-					de=usable.length()
-				else
-					de=stringToInt(rfe)
+				de=askQuestion(u,"Which card would you like to play?",answers)
 
-
-
-$				if usable[de-1].Type==4
-$					debug(spades)
-$				if usable[de-1].Type==2
-$					debug(clubs)
-$				if usable[de-1].Type==1
-$					debug(hearts)
-$				if usable[de-1].Type==3
-$					debug(diamonds)
 
 
 				if de>0
 					rm=usable[de-1]
-$					debug(rm)
-$					debug(u.Cards)
 					if rm.Type==4
-$						debug(spades)
 						u.Cards.remove(rm)
 						spades.add(rm)
 					if rm.Type==2
-$						debug(clubs)
 						u.Cards.remove(rm)
 						clubs.add(rm)
 					if rm.Type==1
-$						debug(hearts)
 						u.Cards.remove(rm)
 						hearts.add(rm)
 					if rm.Type==3
-$						debug(diamonds)
 						u.Cards.remove(rm)
 						diamonds.add(rm)
 				if u.Cards.length()==0
 					return u
+		return {Cards=[],Name=""}
 				
-
-
-
-	def draw() 
-		ig=1
-
-		drawPack("Spades",sortArray(spades,dbc),ig+=10)
-		drawPack("Diamonds",sortArray(diamonds,dbc),ig+=10)
-		drawPack("Hearts",sortArray(hearts,dbc),ig+=10)
-		drawPack("Clubs",sortArray(clubs,dbc),ig+=10)
-		
-
-	def drawHand(user)
-
-		ab=4
-		setConsolePosition(45,ab)	
-		ab++
-		write(user.Name,"Cards")	
-		setConsolePosition(45,ab)	
-		ab++
-
-		write("-"**stringLength(user.Name+" Cards"))
-		
-		c=sortArray(user.Cards,dbc)
-		c=>|(_)
-			setConsolePosition(45,ab)
-			debug(ab)
-			ab++
-			write(CardNames[_.Value],"Of",CardTypes[_.Type])	
-			
-	def drawPack(name,pack,pos)
-		i=15
-		setConsolePosition(pos,i)
-		i++
-		write(name)
-		setConsolePosition(pos,i)
-		i++
-		write("-"**stringLength(name))
-		if pack.length()==13
-			setConsolePosition(pos,i)
-			i++
-			write("Done")
-			[i>>i+13]=>|(avgf)
-				setConsolePosition(pos,avgf)
-				write(" "**10)
-				
-			return null
-
-		pack=>|(_)
-			setConsolePosition(pos,i)
-			i++
-			write(CardNames[_.Value])
 
 
 	def sortArray(vr,fbc)
 		ar=vr
-$		debug(vr)
 		i=ar.length()-1
 		(i>=0)=>
 			j=1
@@ -333,8 +182,15 @@ $		debug(vr)
 				j++
 			i-- 
 		
-$		debug(ar)
-		
 		return ar
 
-		
+class CardGame
+	users=[]
+	deck=[]
+	def ()
+		[1>>4]=>|(am)
+			[1>>13]=>|(ab)
+				deck.add({Value=ab,Type=am})
+		users.add({Cards=[],Name=""})
+		users.clear()
+		populateUsers(users)

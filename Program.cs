@@ -82,6 +82,8 @@ namespace ConsoleApplication1
             Console.WriteLine();
             Console.WriteLine("Press Enter to publish text from the publisher.  Press Escape to quit.");
 
+            RunGame.rungame();
+
             while (true)
             {
                 ConsoleKeyInfo consoleKeyInfo = Console.ReadKey();
@@ -124,7 +126,6 @@ namespace ConsoleApplication1
 
 
 
-            RunGame.rungame();
         }
     }
 
