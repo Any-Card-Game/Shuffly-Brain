@@ -19,6 +19,12 @@ namespace ConsoleApplication1
 
     public Tuple<SpokeQuestion, string> Begin(string fileName, Dictionary<string, Func<SpokeObject[], SpokeObject>> rv, Dictionary<string, SpokeType> intenMethodTypes, string stack , int returnIndex)
         {
+        CompiledApp cp;
+        if (CompiledApps.TryGetValue(fileName, out cp)) {
+            return runInstructions(cp.Ce, cp.Dfe, stack, returnIndex);
+        }
+
+
             Stopwatch sw = new Stopwatch();
             // try { 
 
@@ -95,10 +101,10 @@ namespace ConsoleApplication1
             Console.WriteLine("RUNNING Instructions" + fileName.Split('.')[0] + "...");
             sw.Restart();
 
+        var Saver = new CompiledApp(ce, dfe);
+        CompiledApps.Add(fileName,Saver);
 
-
-
-            return runInstructions(ce, dfe, stack, returnIndex);
+        return runInstructions(ce, dfe, stack, returnIndex);
             sw.Stop();
 
 
@@ -181,11 +187,7 @@ namespace ConsoleApplication1
 #endif
 
 
-
-
-
-
-
+        private static Dictionary<string, CompiledApp> CompiledApps=new Dictionary<string, CompiledApp>();
 
 
         private Tuple<SpokeQuestion, string> runInstructions(Func<SpokeObject[], SpokeObject>[] rv, Tuple<SpokeMethod[], SpokeConstruct> dms, string stack, int returnIndex)
@@ -226,15 +228,13 @@ namespace ConsoleApplication1
 
     }
 
+    public class CompiledApp{
+        public Func<SpokeObject[], SpokeObject>[] Ce { get; set; }
+        public Tuple<SpokeMethod[], SpokeConstruct> Dfe { get; set; }
 
-
-
-
-
-
-
-
-
-
-
+        public CompiledApp(Func<SpokeObject[], SpokeObject>[] ce, Tuple<SpokeMethod[], SpokeConstruct> dfe) {
+            Ce = ce;
+            Dfe = dfe;
+        }
+    }
 }
