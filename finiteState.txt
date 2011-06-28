@@ -1,0 +1,82 @@
+﻿start:
+		goto eval
+
+eval:
+	switch current
+		case word
+			goto word
+		case number
+			goto number
+		case openParen	
+			goto eval
+		case bar
+			getAnonMethodParameters
+			eat anonMethod
+			eat lines
+		case opensqure
+			goto dyanmicArray
+		case openCurly
+			goto dynamicObject
+		case create 
+			goto createObject
+		case return
+			goto return
+
+	switch current
+		case openParen
+			forMethod=anonMethod
+			goto method
+		case equal
+			goto set
+		case anonMethod
+			checkParameters
+			probablyLoop
+		case peroid
+			goto word
+		case equality
+		case lt
+		case gt
+		case lte
+		case gte
+			leftSide=currentObject
+			goto eval
+		
+		case plus
+		case minus
+		case divide
+		case mult
+			leftSide=currentObject
+			goto eval 
+
+
+word:
+	switch current
+		case peroid
+			set currentObject
+			eat peroid
+			goto word
+		case opensqure
+			goto arrayIndex
+
+
+			
+return:
+
+dynamicArray:
+
+dynamicObject:
+
+createObject:
+		
+equality:
+
+set:
+
+anonMethod: 
+
+method:
+
+arrayIndex:			
+
+number:
+	
