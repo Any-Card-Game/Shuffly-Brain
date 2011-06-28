@@ -1,0 +1,55 @@
+<Configuration>
+  <SettingsComponent>
+    <string />
+    <integer />
+    <boolean>
+      <setting name="SolutionAnalysisEnabled">False</setting>
+    </boolean>
+  </SettingsComponent>
+  <CompletionStatisticsManager>
+    <ItemStatistics item="Default">
+      <Item value="public" priority="0" />
+      <Item value="void" priority="0" />
+      <Item value="RunGame`0" priority="0" />
+      <Item value="using" priority="0" />
+      <Item value="System" priority="0" />
+      <Item value="Runtime" priority="0" />
+      <Item value="Serialization" priority="0" />
+      <Item value="Json" priority="0" />
+    </ItemStatistics>
+  </CompletionStatisticsManager>
+  <RecentFiles>
+    <RecentFiles>
+      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/d:Applications/f:sevens.spoke" caret="0" fromTop="0" />
+      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/f:RunInstructions.cs" caret="2480" fromTop="22" />
+      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/f:RunApp.cs" caret="6466" fromTop="180" />
+      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/f:Program.cs" caret="3371" fromTop="29" />
+      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/f:RunGame.cs" caret="37573" fromTop="98" />
+    </RecentFiles>
+    <RecentEdits>
+      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/f:Program.cs" caret="229" fromTop="6" />
+      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/f:Program.cs" caret="345" fromTop="13" />
+      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/f:Program.cs" caret="5119" fromTop="16" />
+      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/f:Program.cs" caret="5083" fromTop="16" />
+      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/f:Program.cs" caret="3379" fromTop="18" />
+      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/f:RunGame.cs" caret="1350" fromTop="27" />
+      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/f:RunGame.cs" caret="2408" fromTop="21" />
+      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/f:RunGame.cs" caret="3046" fromTop="14" />
+      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/f:RunGame.cs" caret="28429" fromTop="2" />
+      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/f:RunGame.cs" caret="29124" fromTop="0" />
+      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/f:RunGame.cs" caret="34419" fromTop="14" />
+      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/f:RunGame.cs" caret="37573" fromTop="23" />
+    </RecentEdits>
+  </RecentFiles>
+  <NAntValidationSettings>
+    <NAntPath value="" />
+  </NAntValidationSettings>
+  <UnitTestRunner>
+    <Providers />
+  </UnitTestRunner>
+  <UnitTestRunnerNUnit>
+    <NUnitInstallDir IsNull="False">
+    </NUnitInstallDir>
+    <UseAddins>Never</UseAddins>
+  </UnitTestRunnerNUnit>
+</Configuration>
