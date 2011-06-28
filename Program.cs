@@ -11,7 +11,7 @@ namespace ConsoleApplication1
 {
     class Program
     {
-        private static List<string> playersInGame = new List<string>();
+        private static Dictionary<string, string> playersInGame = new Dictionary<string, string>();
         private static string stackTrace;
 
         static void Main(string[] args)
@@ -90,30 +90,30 @@ namespace ConsoleApplication1
                         case SpokeMessageType.AskQuestion:
                             return;
                         case SpokeMessageType.JoinGame:
-                            playersInGame.Add(receiveArgs.PublishingClient.Id);
-                            if (playersInGame.Count == 1)
+                            playersInGame.Add(receiveArgs.PublishingClient.Id,payload.PlayerName);
+                            if (playersInGame.Count == 2)
                             {
-                                vf = RunGame.StartGame("sevens");
+                                vf = RunGame.StartGame("sevens", playersInGame);
                                 stackTrace = vf.Item2;
                             }
+                            else return;
                             break;
                         case SpokeMessageType.AnswerQuestion:
-
-                            vf = RunGame.ResumeGame("sevens", stackTrace, payload.AnswerIndex);
+                            vf = RunGame.ResumeGame("sevens", stackTrace, payload.AnswerIndex, playersInGame);
                             stackTrace = vf.Item2;
                             Console.WriteLine(vf.Item1);
                             break;
                         default:
                             throw new ArgumentOutOfRangeException();
                     }
-
+                    
                     SpokeQuestion q = vf.Item1;
 
                     PublicationArgs fc = new PublicationArgs
                     {
                         Publication = new Publication
                         {
-                            Channel = channel,
+                            Channel = channel+"/"+q.User,
                             DataJson = JSON.Serialize(new Payload(q.Question, q.Answers))
                         },
                         OnComplete = (completeArgs) =>
@@ -152,29 +152,7 @@ namespace ConsoleApplication1
                 }
                 if (consoleKeyInfo.Key == ConsoleKey.Enter)
                 {
-                    publisher.Publish(new PublicationArgs
-                    {
-                        Publication = new Publication
-                        {
-                            Channel = channel,
-                            DataJson = JSON.Serialize(new Payload())
-                        },
-                        OnComplete = (completeArgs) =>
-                        {
-                            if (completeArgs.Publication.Successful == true)
-                            {
-                                Console.WriteLine("The publisher published to " + channel + ".");
-                            }
-                            else
-                            {
-                                Console.WriteLine("The publisher could not publish to " + channel + "... " + completeArgs.Publication.Error);
-                            }
-                        },
-                        OnException = (exceptionArgs) =>
-                        {
-                            Console.WriteLine("The publisher threw an exception... " + exceptionArgs.Exception.Message);
-                        }
-                    });
+                     
                 }
             }
 
@@ -187,6 +165,9 @@ namespace ConsoleApplication1
     [DataContract]
     public class Payload
     {
+        [DataMember(Name = "PlayerName")]
+        public string PlayerName;
+
         [DataMember(Name = "Type")]
         public SpokeMessageType Type { get; set; }
         [DataMember(Name = "AnswerIndex")]

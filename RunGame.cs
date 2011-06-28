@@ -11,20 +11,21 @@ using System.Threading;
 namespace ConsoleApplication1
 {
     public class RunGame
-    { 
+    {
 
-        public static Tuple<SpokeQuestion,string> StartGame(string gameName)
+        public static Tuple<SpokeQuestion, string> StartGame(string gameName, Dictionary<string, string> playersInGame)
         {
-             
-             
+
+
             Dictionary<string, SpokeType> vs;
-            Dictionary<string, Func<SpokeObject[], SpokeObject>> rv = getIncludedMethods(out vs);
+            Dictionary<string, Func<SpokeObject[], SpokeObject>> rv = getIncludedMethods(out vs, playersInGame);
 
 
-            return new RunApp().Begin("Applications\\" + gameName + ".spoke", rv, vs,"",0);
+            return new RunApp().Begin("Applications\\" + gameName + ".spoke", rv, vs, "", 0);
         }
 
-        private static Dictionary<string, Func<SpokeObject[], SpokeObject>> getIncludedMethods(out Dictionary<string, SpokeType> vs) {
+        private static Dictionary<string, Func<SpokeObject[], SpokeObject>> getIncludedMethods(out Dictionary<string, SpokeType> vs, Dictionary<string, string> playersInGame)
+        {
             var rv = new Dictionary<string, Func<SpokeObject[], SpokeObject>>() {
                                                                                     {
                                                                                         "write", (a) => {
@@ -337,12 +338,11 @@ namespace ConsoleApplication1
                                                                                                  }
                                                                                         },{
                                                                                               "populateUsers", (a) => {
-                                                                                                                   a[1].AddArray(
-                                                                                                                       new SpokeObject(new SpokeObject[] {
-                                                                                                                                                             new SpokeObject(
-                                                                                                                                                                 new List<SpokeObject>()),
-                                                                                                                                                             new SpokeObject("Sal"),
-                                                                                                                                                         }));
+
+                                                                                                  foreach (var player in playersInGame         )
+                                                                                                  {
+                                                                                                      a[1].AddArray(new SpokeObject(new SpokeObject[] {new SpokeObject(new List<SpokeObject>()),new SpokeObject(player.Value),}));
+                                                                                                                   }
                                                                                                                    return null;
                                                                                                                }
                                                                                               },{"askQuestion",(a)=> {
@@ -407,12 +407,12 @@ namespace ConsoleApplication1
         }
 
 
-        public static Tuple<SpokeQuestion, string> ResumeGame(string gameName, string stack,int returnIndex)
+        public static Tuple<SpokeQuestion, string> ResumeGame(string gameName, string stack, int returnIndex,Dictionary<string, string> playersInGame)
         {
-             
+
 
             Dictionary<string, SpokeType> vs;
-            Dictionary<string, Func<SpokeObject[], SpokeObject>> rv = getIncludedMethods(out vs);
+            Dictionary<string, Func<SpokeObject[], SpokeObject>> rv = getIncludedMethods(out vs, playersInGame);
 
 
             return new RunApp().Begin("Applications\\" + gameName + ".spoke", rv, vs, stack, returnIndex);

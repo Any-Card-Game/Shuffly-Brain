@@ -8,8 +8,8 @@ namespace ConsoleApplication1{
         public string[] Answers;
 
         public SpokeQuestion(string stringVal, string s, string[] toArray) {
-            Question = stringVal;
-            User = s;
+            Question = s;
+            User = stringVal;
             Answers = toArray;
         }
     }

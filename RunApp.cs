@@ -192,7 +192,7 @@ namespace ConsoleApplication1
         {
 
 
-            RunInstructions ri = new RunInstructions(rv, dms.Item1, stack, returnIndex);
+            RunInstructions ri = new RunInstructions(rv, dms.Item1,stack,returnIndex);
             return ri.Run(dms.Item2);
 
 
