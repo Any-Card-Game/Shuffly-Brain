@@ -2275,8 +2275,13 @@ namespace ConsoleApplication1
                     break;
                 case ISpokeItem.Subtraction:
 
-                    l = evaluateItem(((SpokeSubtraction)condition).LeftSide, currentObject, variables);
-                    r = evaluateItem(((SpokeSubtraction)condition).RightSide, currentObject, variables);
+                    if (((SpokeSubtraction)condition).LeftSide == null) {
+                        l = new SpokeType(ObjectType.Int);
+                        new SpokeInstruction(SpokeInstructionType.IntConstant, 0);
+                    }
+                    else l = evaluateItem(((SpokeSubtraction)condition).LeftSide, currentObject, variables);
+
+                        r = evaluateItem(((SpokeSubtraction)condition).RightSide, currentObject, variables);
 
 
 

@@ -41,60 +41,25 @@ namespace ConsoleApplication1
                                                                                                      }
                                                                                                      return null;
                                                                                                  }
-                                                                                        }, 
-                                                                    
+                                                                                        },
+
                                                                                     {
                                                                                         "readLine", (a) => {
-                                                                                                        return new SpokeObject() {
-                                                                                                                                     Type =
-                                                                                                                                         ObjectType
-                                                                                                                                         .
-                                                                                                                                         String,
-#if !dontwrite
-                                                                                                                                     StringVal
-                                                                                                                                         =
-                                                                                                                                         Console
-                                                                                                                                         .
-                                                                                                                                         ReadLine
-                                                                                                                                         ()
-#else
-                                                                    StringVal=""
-#endif
-                                                                                                                                 };
+                                                                                            return new SpokeObject(Console.ReadLine());
                                                                                                     }
                                                                                         },
                                                                                     {
                                                                                         "read", (a) => {
-                                                                                                    return new SpokeObject() {
-                                                                                                                                 Type =
-                                                                                                                                     ObjectType
-                                                                                                                                     .
-                                                                                                                                     String,
-#if !dontwrite
-                                                                                                                                 StringVal
-                                                                                                                                     =
-                                                                                                                                     Console
+                                                                                                    return new SpokeObject(Console
                                                                                                                                      .Read()
                                                                                                                                      .
                                                                                                                                      ToString
-                                                                                                                                     ()
-#else
-                                                                StringVal =""
-#endif
-                                                                                                                             };
+                                                                                                                                     ())  ;
                                                                                                 }
                                                                                         },
                                                                                     {
                                                                                         "stringToInt", (a) => {
-                                                                                                           return new SpokeObject() {
-                                                                                                                                        Type
-                                                                                                                                            =
-                                                                                                                                            ObjectType
-                                                                                                                                            .
-                                                                                                                                            Int,
-                                                                                                                                        IntVal
-                                                                                                                                            =
-                                                                                                                                            int
+                                                                                                           return new SpokeObject(int
                                                                                                                                             .
                                                                                                                                             Parse
                                                                                                                                             (a
@@ -102,32 +67,24 @@ namespace ConsoleApplication1
                                                                                                                                                      1
                                                                                                                                                  ]
                                                                                                                                                  .
-                                                                                                                                                 StringVal)
-                                                                                                                                    };
+                                                                                                                                                 StringVal))  ;
                                                                                                        }
                                                                                         },
                                                                                     {
                                                                                         "floatToInt", (a) => {
-                                                                                                          return new SpokeObject() {
-                                                                                                                                       Type
-                                                                                                                                           =
-                                                                                                                                           ObjectType
-                                                                                                                                           .
-                                                                                                                                           Int,
-                                                                                                                                       IntVal
-                                                                                                                                           =
-                                                                                                                                           (
-                                                                                                                                           int
-                                                                                                                                           )
-                                                                                                                                           a
-                                                                                                                                               [
-                                                                                                                                                   1
-                                                                                                                                               ]
-                                                                                                                                               .
-                                                                                                                                               FloatVal
-                                                                                                                                   };
-                                                                                                      }
-                                                                                        },
+                                                                                            return new SpokeObject(
+                                                                                                                             (
+                                                                                                                             int
+                                                                                                                             )
+                                                                                                                             a
+                                                                                                                                 [
+                                                                                                                                     1
+                                                                                                                                 ]
+                                                                                                                                 .
+                                                                                                                                 FloatVal)
+                                                                                                                                  ;
+                                                                                        }
+                                                                                                      },
                                                                                     {
                                                                                         "debug", (a) => {
                                                                                                      return null;
@@ -161,23 +118,14 @@ namespace ConsoleApplication1
                                                                                         },
                                                                                     {
                                                                                         "stringLength", (a) => {
-                                                                                                            return new SpokeObject() {
-                                                                                                                                         Type
-                                                                                                                                             =
-                                                                                                                                             ObjectType
-                                                                                                                                             .
-                                                                                                                                             Int,
-                                                                                                                                         IntVal
-                                                                                                                                             =
-                                                                                                                                             a
-                                                                                                                                             [
-                                                                                                                                                 1
-                                                                                                                                             ]
-                                                                                                                                             .
-                                                                                                                                             StringVal
-                                                                                                                                             .
-                                                                                                                                             Length
-                                                                                                                                     };
+                                                                                            return new SpokeObject(a
+                                                                                                                             [
+                                                                                                                                 1
+                                                                                                                             ]
+                                                                                                                             .
+                                                                                                                             StringVal
+                                                                                                                             .
+                                                                                                                             Length);
                                                                                                         }
                                                                                         },
                                                                                     {
@@ -195,18 +143,14 @@ namespace ConsoleApplication1
                                                                                                    switch (a[1].Type) {
                                                                                                        case ObjectType.Int:
                                                                                                            var c = a[1].IntVal;
-                                                                                                           return new SpokeObject() {
-                                                                                                                                        IntVal = Math.Abs(c),
-                                                                                                                                        Type = ObjectType.Int
-                                                                                                                                    };
+                                                                                                           return new SpokeObject(Math.Abs(c));
 
                                                                                                            break;
                                                                                                        case ObjectType.Float:
                                                                                                            var cd = a[1].FloatVal;
-                                                                                                           return new SpokeObject() {
-                                                                                                                                        FloatVal = Math.Abs(cd),
-                                                                                                                                        Type = ObjectType.Float
-                                                                                                                                    };
+                                                                                                           return new SpokeObject(Math.Abs(
+                                                                                                                                                cd))
+                                                                                                                                                 ;
 
                                                                                                            break;
                                                                                                        default:
@@ -219,15 +163,7 @@ namespace ConsoleApplication1
                                                                                         "nextRandom", (a) => {
 
                                                                                                           if (a.Length == 2) {
-                                                                                                              return new SpokeObject() {
-                                                                                                                                           Type
-                                                                                                                                               =
-                                                                                                                                               ObjectType
-                                                                                                                                               .
-                                                                                                                                               Int,
-                                                                                                                                           IntVal
-                                                                                                                                               =
-                                                                                                                                               rad
+                                                                                                              return new SpokeObject(rad
                                                                                                                                                .
                                                                                                                                                Next
                                                                                                                                                (a
@@ -235,19 +171,10 @@ namespace ConsoleApplication1
                                                                                                                                                         1
                                                                                                                                                     ]
                                                                                                                                                     .
-                                                                                                                                                    IntVal)
-                                                                                                                                       };
+                                                                                                                                                    IntVal))  ;
 
                                                                                                           }
-                                                                                                          return new SpokeObject() {
-                                                                                                                                       Type
-                                                                                                                                           =
-                                                                                                                                           ObjectType
-                                                                                                                                           .
-                                                                                                                                           Int,
-                                                                                                                                       IntVal
-                                                                                                                                           =
-                                                                                                                                           rad
+                                                                                                          return new SpokeObject(rad
                                                                                                                                            .
                                                                                                                                            Next
                                                                                                                                            (a
@@ -261,31 +188,23 @@ namespace ConsoleApplication1
                                                                                                                                                     2
                                                                                                                                                 ]
                                                                                                                                                 .
-                                                                                                                                                IntVal)
-                                                                                                                                   };
+                                                                                                                                                IntVal));
                                                                                                           return null;
                                                                                                       }
                                                                                         },
                                                                                     {
                                                                                         "rand", (a) => {
-                                                                                                    var vfd = new SpokeObject() {
-                                                                                                                                    Type =
-                                                                                                                                        ObjectType
-                                                                                                                                        .
-                                                                                                                                        Float,
-                                                                                                                                    FloatVal
-                                                                                                                                        =
-                                                                                                                                        (
-                                                                                                                                        float
-                                                                                                                                        )
-                                                                                                                                        rad
-                                                                                                                                            .
-                                                                                                                                            NextDouble
-                                                                                                                                            ()
-                                                                                                                                };
+                                                                                            var vfd = new SpokeObject((
+                                                                                                                                float
+                                                                                                                                )
+                                                                                                                                rad
+                                                                                                                                    .
+                                                                                                                                    NextDouble
+                                                                                                                                    ())
+                                                                                                                                     ;
                                                                                                     return vfd;
                                                                                                 }
-                                                                                        }, 
+                                                                                        },
                                                                                     {
                                                                                         "wait", (a) => {
 #if !dontwrite
@@ -295,7 +214,7 @@ namespace ConsoleApplication1
 #endif
                                                                                                     return null;
                                                                                                 }
-                                                                                        }, 
+                                                                                        },
                                                                                     {
                                                                                         "clone", (a) => {
                                                                                                      return new SpokeObject() {
@@ -337,21 +256,28 @@ namespace ConsoleApplication1
                                                                                                                                       ClassName,
                                                                                                                               };
                                                                                                  }
-                                                                                        },{
-                                                                                              "populateUsers", (a) => {
+                                                                                        },
+                                                                                    {
+                                                                                        "populateUsers", (a) => {
 
-                                                                                                  foreach (var player in playersInGame         )
-                                                                                                  {
-                                                                                                      a[1].AddArray(new SpokeObject(new SpokeObject[] {new SpokeObject(new List<SpokeObject>()),new SpokeObject(player.Value),}, "User"));
-                                                                                                                   }
-                                                                                                                   return null;
-                                                                                                               }
-                                                                                              },{"askQuestion",(a)=> {
-                                                                                                  
+                                                                                                             SpokeObject rt =
+                                                                                                                 new SpokeObject(
+                                                                                                                     new List<SpokeObject>());
+                                                                                                             foreach (
+                                                                                                                 var player in playersInGame) {
+                                                                                                                 rt.AddArray(new SpokeObject(player.Value));
+                                                                                                             }
+                                                                                                             return rt;
+                                                                                                         }
+                                                                                        },
+                                                                                    {
+                                                                                        "askQuestion", (a) => {
 
-                                                                                                                   return new SpokeObject(0);
 
-                                                                                                               }}
+                                                                                                           return new SpokeObject(0);
+
+                                                                                                       }
+                                                                                        }
                                                                                 };
             vs = new Dictionary<string, SpokeType>() {
                                                          {
@@ -399,7 +325,7 @@ namespace ConsoleApplication1
                                                          {
                                                              "clone", new SpokeType(ObjectType.Object)
                                                              },{
-                                                                   "populateUsers", new SpokeType(ObjectType.Void)
+                                                                   "populateUsers", new SpokeType(ObjectType.Array)
                                                                    },{
                                                                          "askQuestion", new SpokeType(ObjectType.Int)
                                                                          }

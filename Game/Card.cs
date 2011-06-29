@@ -6,9 +6,10 @@ namespace ConsoleApplication1.Game
 {
     public class Card
     {
-        public Card(int number, int type)
+        public Card(int number, int type, string cardName)
         {
             CardType = type;
+            CardName = cardName;
             CardNumber = number;
         }
         public Card()
@@ -17,5 +18,6 @@ namespace ConsoleApplication1.Game
 
         public int CardNumber { get; set; }
         public int CardType{ get; set; }
+        public string CardName { get; set; }
     }
 }

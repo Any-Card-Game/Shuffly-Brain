@@ -19,7 +19,7 @@ namespace ConsoleApplication1
 
 
         private SpokeObject[] ints;
-        private SpokeObject NULL = new SpokeObject() { Type = ObjectType.Null };
+        private SpokeObject NULL = new SpokeObject(ObjectType.Null);
 
 
         private SpokeObject TRUE = new SpokeObject(ObjectType.Bool) { BoolVal = true };
@@ -49,31 +49,147 @@ namespace ConsoleApplication1
 
 
         }
+
+        private static List<StackTracer> stf;
+
         private string serialize()
         {
             XmlSerializer sr = new XmlSerializer(typeof(List<StackTracer>));
             StringWriter sw;
+
+            stf = stackTrace;
+            
+            var fs = new fixStackTracer(stackTrace.ToArray());
+            stackTrace = new List<StackTracer>(fs.Start(true));
+
             sr.Serialize(sw = new StringWriter(), stackTrace);
             return sw.ToString();
         }
         private void deserialize(string sz)
         {
             XmlSerializer sr = new XmlSerializer(typeof(List<StackTracer>));
-
-
-
             List<StackTracer> f = (List<StackTracer>)sr.Deserialize(new StringReader(sz));
-
             reprintStackTrace = f.ToArray();
             reprintStackIndex = reprintStackTrace.Length;
+
+            var fs = new fixStackTracer(reprintStackTrace);
+            reprintStackTrace = fs.Start(false);
+
+            reprintStackTrace=stf.ToArray();
+
+
+        }
+
+        class fixStackTracer
+        {
+            private readonly StackTracer[] myTc;
+            Dictionary<int, SpokeObject> ids = new Dictionary<int, SpokeObject>();
+            public fixStackTracer(StackTracer[] tc)
+            {
+                myTc = tc;
+            }
+
+            public StackTracer[] Start(bool d)
+            {
+
+                foreach (var stackTracer in myTc)
+                {
+                    for (int index = 0; index < stackTracer.StackObjects.Length; index++)
+                    {
+                        stackTracer.StackObjects[index] = getAllVariables(stackTracer.StackObjects[index], d);
+                    }
+                }
+
+
+                foreach (var stackTracer in myTc)
+                {
+                    for (int index = 0; index < stackTracer.StackObjects.Length; index++)
+                    {
+                        stackTracer.StackObjects[index] = getAllVariables(stackTracer.StackObjects[index], !d);
+                    }
+                }
+
+
+                return myTc;
+            }
+
+            private SpokeObject getAllVariables(SpokeObject so, bool check)
+            {
+                if (so == null) return null;
+
+                if (so.ArrayItems != null)
+                    for (int index = 0; index < so.ArrayItems.Count; index++)
+                    {
+                        so.ArrayItems[index] = getAllVariables(so.ArrayItems[index], check);
+                    }
+                if (so.Variables != null)
+                    for (int index = 0; index < so.Variables.Length; index++)
+                    {
+
+                        so.Variables[index] = getAllVariables(so.Variables[index], check);
+                    }
+                so = this.check(so, check);
+                return so;
+            }
+
+            private SpokeObject check(SpokeObject so, bool check)
+            {
+                SpokeObject f;
+                if (ids.TryGetValue(so.ID, out f))
+                {
+                    if (check)
+                    {
+                        if (f.Equals(so))
+                        {
+                            return f;
+                        }
+                        else
+                        {
+                            return so;
+                        }
+                    }
+
+                    if (!so.Compare(f))
+                        return f;
+                    else
+                    {
+
+                        if (so.ArrayItems != null)
+                        {
+                            if (so.ArrayItems.Equals(f.ArrayItems))
+                            {
+                                return f;
+                            }
+                            else {
+                                so.ArrayItems = f.ArrayItems;
+                                return f;
+                            }
+                        }
+                        if (so.Variables != null)
+                        {
+                            if (so.Variables.Equals(f.Variables))
+                            {
+                                return f;
+                            }
+                            else
+                            {
+                                so.Variables = f.Variables;
+                                return f;
+                            }
+                        }
+                        return f;
+                    }
+                }
+                ids.Add(so.ID, so);
+                return so;
+            }
         }
 
 
         public Tuple<SpokeQuestion, string, GameBoard> Run(SpokeConstruct so)
         {
             var fm = Methods[so.MethodIndex];
-            SpokeObject dm = new SpokeObject() { Type = ObjectType.Object };
-            dm.Variables = new SpokeObject[so.NumOfVars];
+            SpokeObject dm = new SpokeObject(new SpokeObject[so.NumOfVars], "Main");
             for (int index = 0; index < so.NumOfVars; index++)
             {
                 dm.SetVariable(index, new SpokeObject());
@@ -88,12 +204,12 @@ namespace ConsoleApplication1
             }
 
 #if stacktrace
-            
-            catch (Exception er) {
-                dfss.AppendLine(er.ToString());
-                File.WriteAllText("C:\\ded.txt", dfss.ToString());
-                throw er;
-            }
+			
+			catch (Exception er) {
+				dfss.AppendLine(er.ToString());
+				File.WriteAllText("C:\\ded.txt", dfss.ToString());
+				throw er;
+			}
 #endif
 
             return null;
@@ -132,7 +248,7 @@ namespace ConsoleApplication1
         public StackTracer[] reprintStackTrace = new StackTracer[0];
 
 #if stacktrace
-        private StringBuilder dfss = new StringBuilder();
+		private StringBuilder dfss = new StringBuilder();
 #endif
 
 
@@ -141,17 +257,12 @@ namespace ConsoleApplication1
         private SpokeObject evaluateMethod(SpokeMethod fm, SpokeObject[] paras)
         {
 
-            SpokeObject[] variables = new SpokeObject[fm.NumOfVars];
-
-            for (int i = 0; i < fm.Parameters.Length; i++)
-            {
-                variables[i] = paras[i];
-            }
+            SpokeObject[] variables;
 
 
 
 #if stacktrace
-            dfss.AppendLine( fm.Class.Name +" : : "+fm.MethodName+" Start");
+			dfss.AppendLine( fm.Class.Name +" : : "+fm.MethodName+" Start");
 #endif
 
             SpokeObject lastStack;
@@ -161,6 +272,13 @@ namespace ConsoleApplication1
             StackTracer st;
             if (reprintStackIndex == -1)
             {
+                variables = new SpokeObject[fm.NumOfVars];
+
+                for (int i = 0; i < fm.Parameters.Length; i++)
+                {
+                    variables[i] = paras[i];
+                }
+
                 stackTrace.Add(st = new StackTracer(stack, variables));
             }
             else
@@ -183,8 +301,13 @@ namespace ConsoleApplication1
             {
                 var ins = fm.Instructions[index];
 #if stacktrace
-                dfss.AppendLine(stackIndex + " ::  " + ins.ToString());
+				dfss.AppendLine(stackIndex + " ::  " + ins.ToString());
 #endif
+
+
+                //        var fs = new fixStackTracer(stackTrace.ToArray());
+                //       stackTrace = new List<StackTracer>(fs.Start(true));
+
 
                 SpokeObject[] sps;
 
@@ -250,7 +373,7 @@ namespace ConsoleApplication1
 
 
                             throw new AskQuestionException(stackTrace,
-                                                           new SpokeQuestion(sps[1].Variables[1].StringVal, sps[2].StringVal,
+                                                           new SpokeQuestion(sps[1].Variables[0].StringVal, sps[2].StringVal,
                                                                              sps[3].ArrayItems.Select(a => a.StringVal).ToArray()), d);
                         }
                         else
@@ -264,7 +387,7 @@ namespace ConsoleApplication1
                         break;
                     case SpokeInstructionType.Return:
 #if stacktrace
-                        dfss.AppendLine(fm.Class.Name + " : : " + fm.MethodName + " End");
+						dfss.AppendLine(fm.Class.Name + " : : " + fm.MethodName + " End");
 #endif
                         stackTrace.Remove(st);
                         return stack[--stackIndex];
@@ -309,14 +432,15 @@ namespace ConsoleApplication1
                     case SpokeInstructionType.StoreLocalMethod:
                     case SpokeInstructionType.StoreLocalObject:
                         lastStack = stack[--stackIndex];
-                        bm = variables[ins.Index];
                         variables[ins.Index] = lastStack;
                         break;
                     case SpokeInstructionType.StoreLocalRef:
                         lastStack = stack[--stackIndex];
                         bm = variables[ins.Index];
-                        bm.Variables = lastStack.Variables;
-                        bm.ArrayItems = lastStack.ArrayItems;
+                        bm.ClassName = lastStack.ClassName;
+                        bm.Type = lastStack.Type;
+                        //bm.Variables = lastStack.Variables;
+                        //bm.ArrayItems = lastStack.ArrayItems;
                         bm.StringVal = lastStack.StringVal;
                         bm.IntVal = lastStack.IntVal;
                         bm.BoolVal = lastStack.BoolVal;
@@ -361,8 +485,8 @@ namespace ConsoleApplication1
                             continue;
                         }
 
-				stackIndex = stackIndex - 1;
-				index = ins.Index;
+                        stackIndex = stackIndex - 1;
+                        index = ins.Index;
                         break;
                     case SpokeInstructionType.StoreToReference:
 
@@ -573,7 +697,7 @@ namespace ConsoleApplication1
             }
 
 #if stacktrace
-            dfss.AppendLine(fm.Class.Name + " : : " + fm.MethodName + " End");
+			dfss.AppendLine(fm.Class.Name + " : : " + fm.MethodName + " End");
 #endif
             stackTrace.Remove(st);
             return null;
@@ -588,7 +712,7 @@ namespace ConsoleApplication1
 
 
             gb.MainArea = buildArea(mainArea, getVariableByName(spokeObject, "piles"));
-            gb.UserAreas=new List<TableArea>();
+            gb.UserAreas = new List<TableArea>();
             foreach (var area in userAreas.ArrayItems)
             {
                 gb.UserAreas.Add(buildArea(area, getVariableByName(spokeObject, "piles")));
@@ -598,7 +722,7 @@ namespace ConsoleApplication1
             return gb;
         }
 
-        private TableArea buildArea(SpokeObject mainArea,SpokeObject cardgamePiles)
+        private TableArea buildArea(SpokeObject mainArea, SpokeObject cardgamePiles)
         {
             var tca = new TableArea();
             tca.Dimensions = getRect(getVariableByName(mainArea, "dimensions"));
@@ -621,14 +745,12 @@ namespace ConsoleApplication1
                 ts.StackCards = getVariableByName(space, "stackCards").BoolVal;
                 ts.Cards = new List<Card>();
 
-                foreach (var cardgamePile in cardgamePiles.ArrayItems) {
-                    if (getVariableByName(cardgamePile, "Name").StringVal == getVariableByName(space, "pileName").StringVal) {
-
-
+                foreach (var cardgamePile in cardgamePiles.ArrayItems)
+                {
+                    if (getVariableByName(cardgamePile, "Name").StringVal == getVariableByName(space, "pileName").StringVal)
+                    {
                         foreach (var card in getVariableByName(cardgamePile, "Cards").ArrayItems)
-                            ts.Cards.Add(new Card(getVariableByName(card, "Value").IntVal, getVariableByName(card, "Type").IntVal));
-
-                        
+                            ts.Cards.Add(new Card(getVariableByName(card, "Value").IntVal, getVariableByName(card, "Type").IntVal, getVariableByName(card, "CardName").StringVal));
                         break;
                     }
                 }

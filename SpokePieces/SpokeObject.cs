@@ -27,8 +27,11 @@ namespace ConsoleApplication1
         public SpokeVariable ReturnYield;
     }
     [Serializable]
-    public class SpokeObject
-    {
+    public class SpokeObject{
+        private static int ids;
+        public int ID;
+
+
         public int IntVal;
         public string StringVal;
         public bool BoolVal;
@@ -48,7 +51,7 @@ namespace ConsoleApplication1
         public SpokeObject(int inde)
         {
             IntVal = inde;
-            Type = ObjectType.Int;
+            Type = ObjectType.Int; ID = ids++;
         }
         public SpokeObject(SpokeObject[] inde, string className)
         {
@@ -56,26 +59,31 @@ namespace ConsoleApplication1
 
             Variables = inde;
             Type = ObjectType.Object;
-            ClassName = className;
+            ClassName = className; ID = ids++;
+
         }
         public SpokeObject(List<SpokeObject> inde)
         {
-            ArrayItems = inde; Type = ObjectType.Array;
+            ArrayItems = inde; Type = ObjectType.Array; ID = ids++;
+
 
         }
         public SpokeObject(float inde)
         {
-            FloatVal = inde; Type = ObjectType.Float;
+            FloatVal = inde; Type = ObjectType.Float; ID = ids++;
+
 
 
         }
         public SpokeObject(string inde)
         {
-            StringVal = inde; Type = ObjectType.String;
+            StringVal = inde; Type = ObjectType.String; ID = ids++;
+
 
         }
         public SpokeObject(bool inde) {
-            BoolVal = inde; Type = ObjectType.Bool;
+            BoolVal = inde; Type = ObjectType.Bool; ID = ids++;
+
 
         }
 
@@ -83,7 +91,9 @@ namespace ConsoleApplication1
         public SpokeObject(ObjectType type)
         {
 
-            Type = type;
+            Type = type; 
+            ID=ids++;
+
         }
 
         public void SetVariable(int name, SpokeObject obj)
@@ -141,6 +151,9 @@ namespace ConsoleApplication1
                 case ObjectType.Null:
                     return true;
                     break;
+                case ObjectType.Unset:
+                    return true;
+                    break;
                 case ObjectType.Int:
                     return left.IntVal == right.IntVal;
                     break;
@@ -159,14 +172,27 @@ namespace ConsoleApplication1
 
                     for (int i = 0; i < left.Variables.Length; i++)
                     {
-                        if (!Compare(right.Variables[i], left.Variables[i]))
+                        if (!Compare(left.Variables[i],right.Variables[i]))
+                        {
+                            return false;
+                        }
+                    
+                    }
+                    return true;
+                    break;
+                case ObjectType.Array:
+
+                    if (left.ArrayItems.Count != right.ArrayItems.Count) return false;
+
+                    for (int i = 0; i < left.ArrayItems.Count; i++)
+                    {
+                        if (!Compare(right.ArrayItems[i], left.ArrayItems[i]))
                         {
                             return false;
                         }
                     }
                     return true;
                     break;
-                case ObjectType.Array:
 
                 case ObjectType.Method:
                 default:

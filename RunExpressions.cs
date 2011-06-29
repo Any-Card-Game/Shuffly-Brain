@@ -18,7 +18,7 @@ namespace ConsoleApplication1
         private SpokeObject FALSE = new SpokeObject(ObjectType.Bool) { BoolVal = false };
         private SpokeObject TRUE = new SpokeObject(ObjectType.Bool) { BoolVal = true };
         private SpokeObject[] ints;
-        private SpokeObject NULL = new SpokeObject() { Type = ObjectType.Null };
+        private SpokeObject NULL = new SpokeObject(ObjectType.Null) ;
 
         private SpokeObject intCache(int index)
         {
@@ -46,10 +46,10 @@ namespace ConsoleApplication1
         {
             var fm = Methods[so.MethodIndex];
             //            var fm = _cla.First(a => a.Name == so.ClassName).Methods.First(a => a.MethodName == ".ctor");
-            SpokeObject dm = new SpokeObject() {  Type = ObjectType.Object };
+            SpokeObject dm = new SpokeObject(ObjectType.Object) ;
             dm.Variables = new SpokeObject[so.NumOfVars];
             for (int index = 0; index < so.NumOfVars; index++){
-                dm.SetVariable(index, new SpokeObject());
+                dm.SetVariable(index, new SpokeObject(ObjectType.Null));
             }
             evaluate(fm, dm, new SpokeObject[1] { dm });
             // evaluate(fm, dm, new List<SpokeObject>() { dm });
@@ -1044,7 +1044,7 @@ namespace ConsoleApplication1
                                 case ObjectType.Int: return intCache(l.IntVal /r.IntVal);
 
                                     break;
-                                case ObjectType.Float: return new SpokeObject() { FloatVal = l.IntVal / r.FloatVal, Type = r.Type };
+                                case ObjectType.Float: return new SpokeObject(l.IntVal / r.FloatVal)  ;
 
                                     break;
 
@@ -1054,10 +1054,10 @@ namespace ConsoleApplication1
                             break;
                         case ObjectType.Float: switch (r.Type)
                             {
-                                case ObjectType.Int: return new SpokeObject() { FloatVal = l.FloatVal / r.IntVal, Type = l.Type };
+                                case ObjectType.Int: return new SpokeObject(l.FloatVal / r.IntVal)  ;
 
                                     break;
-                                case ObjectType.Float: return new SpokeObject() { FloatVal = l.FloatVal / r.FloatVal, Type = l.Type };
+                                case ObjectType.Float: return new SpokeObject(l.FloatVal / r.FloatVal)  ;
 
                                     break;
                                 default:
@@ -1107,8 +1107,7 @@ namespace ConsoleApplication1
                     }
 
 
-
-                    return new SpokeObject() { BoolVal = l.IntVal > r.IntVal, Type = ObjectType.Bool };
+                     
                     break;
                 case ISpokeItem.Less:
 
