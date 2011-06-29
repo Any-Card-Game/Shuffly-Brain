@@ -128,7 +128,8 @@ class Main
 		 
 		CardTypes=["","Hearts","Clubs","Diamonds","Spades"]
 		CardNames=["","Ace","Deuce","Three","Four","Five","Six","Seven","Eight","Nine","Ten","Jack","Queen","King"]
-	
+
+		readLine()
 
 		(1<2)=>
 			cardgame.users=>|(u)

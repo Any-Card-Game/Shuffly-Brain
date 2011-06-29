@@ -32,7 +32,8 @@ namespace ConsoleApplication1
         If, Return, MethodCall, AnonMethod, Construct,
         Set,
         Yield,
-        YieldReturn
+        YieldReturn,
+        Switch
     }
     public enum ISpokeItem
     {
@@ -46,7 +47,58 @@ namespace ConsoleApplication1
         Null,
         Bool
     }
-    public class SpokeIf : s,SpokeLine, SpokeLines
+
+    public class SpokeSwitch : s, SpokeLines, SpokeLine
+    {
+        public SpokeItem Condition;
+        public Case[] Cases;
+
+        public class Case
+        {
+            public SpokeItem Item;
+            public SpokeLine[] Lines;
+            public bool NeedsTop;
+
+            public Case(SpokeItem i, SpokeLine[] l)
+            {
+                Item = i;
+                Lines = l;
+            }
+        }
+
+        public SpokeSwitch(SpokeItem condition)
+        {
+            Condition = condition;
+        }
+
+
+        public override string ToString()
+        {
+            return "switch";
+        }
+        
+        public SpokeLine[] Lines
+        {
+            get
+            {
+                List<SpokeLine> fm = new List<SpokeLine>();
+                for (int i = 0; i < Cases.Length; i++)
+                {
+                    Case j = Cases[i];
+                    fm.AddRange(j.Lines);
+                }
+                return fm.ToArray();
+
+            }
+            set { }
+        }
+
+        public ISpokeLine LType
+        {
+            get { return ISpokeLine.Switch; }
+        }
+    }
+    public class SpokeIf : s, SpokeLine, SpokeLines
     {
         public SpokeItem Condition;
         public SpokeLine[] IfLines;
@@ -107,7 +159,8 @@ namespace ConsoleApplication1
         {
             get { return guid; }
         }
-        public void resetGUID() {
+        public void resetGUID()
+        {
             guid = (Index++).ToString();
         }
     }
@@ -160,7 +213,8 @@ namespace ConsoleApplication1
             get { return ISpokeItem.ArrayIndex; }
         }
 
-        public override string ToString() {
+        public override string ToString()
+        {
             return Parent + "[" + Index + "]";
         }
 
@@ -173,7 +227,8 @@ namespace ConsoleApplication1
         {
             get { return ISpokeItem.Array; }
         }
-        public override string ToString() {
+        public override string ToString()
+        {
             return "[" + Parameters.Aggregate("", (a, b) => a + b + ", ") + "]";
         }
     }
@@ -218,7 +273,9 @@ namespace ConsoleApplication1
 
     }
 
-    public enum SpokeVType { V,MethodName, ThisV,
+    public enum SpokeVType
+    {
+        V, MethodName, ThisV,
         InternalMethodName
     }
     public class SpokeVariable : s, SpokeParent, SpokeItem
@@ -236,7 +293,8 @@ namespace ConsoleApplication1
         }
         public override string ToString()
         {
-            if (Parent==null) {
+            if (Parent == null)
+            {
                 return VariableName;
             }
             return Parent + "." + VariableName;
@@ -323,7 +381,7 @@ namespace ConsoleApplication1
         public int NumOfVars
             ;
 
-        public int MethodIndex=-1;
+        public int MethodIndex = -1;
 
         public ISpokeItem IType
         {
@@ -483,7 +541,7 @@ namespace ConsoleApplication1
         }
         public override string ToString()
         {
-            return LeftSide+ "=="+RightSide;
+            return LeftSide + "==" + RightSide;
         }
 
 

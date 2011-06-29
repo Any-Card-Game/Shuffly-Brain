@@ -50,6 +50,10 @@ namespace ConsoleApplication1
                     {
                         spokeInstruction.Index = labels[spokeInstruction.elseGuy];
                     }
+                    if (spokeInstruction.Type == SpokeInstructionType.IfEqualsContinueAndPopElseGoto)
+                    {
+                        spokeInstruction.Index = labels[spokeInstruction.elseGuy];
+                    }
                 }
             }
 
@@ -144,6 +148,27 @@ namespace ConsoleApplication1
                         }
                     }
                 }
+
+                if (spokeInstruction.Type == SpokeInstructionType.IfEqualsContinueAndPopElseGoto)
+                {
+                    if (spokeInstruction.StackBefore_ > -1)
+                    {
+                        if (spokeInstruction.StackBefore_ != curStack)
+                        {
+                            throw new Exception("Theory gay");
+                        }
+                    }
+                    else
+                    {
+                        spokeInstruction.StackBefore_ = curStack;
+
+                        doit(curStack - 2, index + 1, ins);
+                        doit(curStack - 1, spokeInstruction.Index + 1, ins);
+                    }
+                    return;
+                }
+
+
                 if (spokeInstruction.Type == SpokeInstructionType.IfTrueContinueElse)
                 {
                     if (spokeInstruction.StackBefore_ > -1)

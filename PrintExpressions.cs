@@ -123,7 +123,7 @@ namespace ConsoleApplication1
             {
                 case ISpokeLine.If:
                     sb.Append("If ");
-        sb.Append(            evalute(((SpokeIf)spokeLine).Condition, tabIndex));
+                    sb.Append(evalute(((SpokeIf)spokeLine).Condition, tabIndex));
                     sb.AppendLine(evaluateLines(((SpokeIf)spokeLine).IfLines.ToArray(), tabIndex + 1));
                     if (((SpokeIf)spokeLine).ElseLines != null)
                     {
@@ -135,6 +135,10 @@ namespace ConsoleApplication1
                         sb.AppendLine(evaluateLines(((SpokeIf)spokeLine).ElseLines.ToArray(), tabIndex + 1));
                     }
 
+                    break;
+                case ISpokeLine.Switch:
+                    sb.Append("switch ");
+                    
                     break;
                 case ISpokeLine.Return:
                     sb.Append("Return ");

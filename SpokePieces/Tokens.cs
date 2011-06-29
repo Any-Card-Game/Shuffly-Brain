@@ -24,7 +24,8 @@ namespace ConsoleApplication1
         Ampersand = '&',
         SemiColon = ';', Colon = ':',
         QuestionMark = '?',
-        Carot = '^'
+        Carot = '^',
+        Switch
     }
     public class TokenOpenSquare : IToken { public Token Type { get { return Token.OpenSquare; } } public TokenOpenSquare() { } public override string ToString() { return ((char)Type).ToString(); } }
     public class TokenCloseSquare : IToken { public Token Type { get { return Token.CloseSquare; } } public TokenCloseSquare() { } public override string ToString() { return ((char)Type).ToString(); } }
@@ -111,6 +112,26 @@ namespace ConsoleApplication1
             return ((char)Type).ToString();
         }
     }
+
+    public class TokenSwitch :IToken {
+
+ 
+
+	public TokenSwitch() {
+	}
+
+	
+	public override string ToString() {
+		return "switch";
+	}
+
+        public Token Type {
+            get { return Token.Switch; }
+        }
+    }
+
+
+
     public class TokenYield : IToken { public Token Type { get { return Token.Yield; } } public TokenYield() { } public override string ToString() { return "Yield" + " "; } }
     public class TokenCarot : IToken { public Token Type { get { return Token.Carot; } } public TokenCarot() { } public override string ToString() { return "^"; } }
 

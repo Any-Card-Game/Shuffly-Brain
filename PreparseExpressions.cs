@@ -166,6 +166,11 @@ namespace ConsoleApplication1
                 List<SpokeInstruction> ddsf;
                 switch (spokeLine.LType)
                 {
+                    case ISpokeLine.Switch:
+                        evaluateSwitch(currentObject, variables,
+                                (SpokeSwitch)spokeLine);
+
+                        break;
                     case ISpokeLine.If:
                         var b = evaluateItem(((SpokeIf)spokeLine).Condition, currentObject, variables);
 
@@ -617,6 +622,92 @@ namespace ConsoleApplication1
 
         }
 
+        private void evaluateSwitch(SpokeMethodParse currentObject,
+                    SpokeVariableInfo variables,
+                    SpokeSwitch spokeLine)
+        {
+            SpokeType df;
+            SpokeType b = evaluateItem(spokeLine.Condition, currentObject,
+                     variables);
+
+            for (int i = 0; i < spokeLine.Cases.Length; i++)
+            {
+                SpokeSwitch.Case c = spokeLine.Cases[i];
+
+                if (i != 0)
+                {
+                    new SpokeInstruction(SpokeInstructionType.Label, "Case" + i
+                            + "_" + spokeLine.Guid);
+                }
+
+                SpokeType curCase = evaluateItem(c.Item, currentObject,
+                         variables);
+
+                if (b.Type != curCase.Type)
+                {
+                    throw new Exception("Expected " + b.Type);
+                }
+
+                if ((i + 1 == spokeLine.Cases.Length))
+                {
+
+                    new SpokeInstruction(SpokeInstructionType.Equal);
+
+                    new SpokeInstruction(
+                            SpokeInstructionType.IfTrueContinueElse,
+                            "EndSwitch" + spokeLine.Guid);
+
+                }
+                else
+                {
+                    new SpokeInstruction(
+                            SpokeInstructionType.IfEqualsContinueAndPopElseGoto,
+                            "Case" + (i + 1) + "_" + spokeLine.Guid);
+
+                    if (c.Lines.Length == 0)
+                    {
+
+                        for (int j = i + 1; j < spokeLine.Cases.Length; j++)
+                        {
+                            SpokeSwitch.Case cj = spokeLine.Cases[j];
+                            if (cj.Lines.Length > 0)
+                            {
+                                cj.NeedsTop = true;
+                                new SpokeInstruction(SpokeInstructionType.Goto, "top" + "Case" + (j) + "_" + spokeLine.Guid);
+                                break;
+                            }
+                        }
+                    }
+                }
+
+
+                if (c.NeedsTop)
+                {
+                    new SpokeInstruction(SpokeInstructionType.Label, "top" + "Case" + (i) + "_" + spokeLine.Guid);
+
+                }
+                variables.IncreaseState();
+                df = evaluateLines(ref c.Lines,
+                        currentObject, variables);
+
+                variables.DecreaseState();
+                if (currentObject.ReturnType != null
+                        && !currentObject.ReturnType.CompareTo(df, true))
+                {
+                    throw new Exception("for return:    Expected "
+                            + currentObject.ReturnType.Type + " Got" + df.Type);
+                }
+
+                new SpokeInstruction(SpokeInstructionType.Goto, "EndSwitch"
+                        + spokeLine.Guid);
+
+            }
+
+            new SpokeInstruction(SpokeInstructionType.Label, "EndSwitch"
+                    + spokeLine.Guid);
+
+        }
+
         private void setInstru(ObjectType type, int index)
         {
             switch (type)
@@ -866,7 +957,7 @@ namespace ConsoleApplication1
                         /*  var orig = new array();
                           var d = new array();
                           var dexes = new array();
-                        
+						
                           int ind = 0;
                           while(true) {
                               if (ind < orig.length)
@@ -2010,7 +2101,7 @@ namespace ConsoleApplication1
 
                         rf.MethodIndex = Methods.Select(a => a.Value).ToList().IndexOf(fm);
 
-                        new SpokeInstruction(SpokeInstructionType.CreateReference, drj.Variables.Length,cons.ClassName) { DEBUG = rf.ClassName };
+                        new SpokeInstruction(SpokeInstructionType.CreateReference, drj.Variables.Length, cons.ClassName) { DEBUG = rf.ClassName };
 
                         if (fm.VariableRefs == null)
                         {
@@ -2032,15 +2123,17 @@ namespace ConsoleApplication1
                         foreach (var spokeItem in rf.SetVars)
                         {
                             SpokeType st;
-                            if (cons.Variables.TryGetValue(spokeItem.Name, out st, null)) {
+                            if (cons.Variables.TryGetValue(spokeItem.Name, out st, null))
+                            {
                                 spokeItem.Index = cons.Variables.Set(spokeItem.Name,
                                                                      evaluateItem(spokeItem.Item, currentObject, variables),
                                                                      null);
-                            }else
-                                
-                            spokeItem.Index = cons.Variables.Add(spokeItem.Name,
-                                                                 evaluateItem(spokeItem.Item, currentObject, variables),
-                                                                 null);
+                            }
+                            else
+
+                                spokeItem.Index = cons.Variables.Add(spokeItem.Name,
+                                                                     evaluateItem(spokeItem.Item, currentObject, variables),
+                                                                     null);
 
                             new SpokeInstruction(SpokeInstructionType.StoreToReference, spokeItem.Index);
                         }
@@ -2065,9 +2158,10 @@ namespace ConsoleApplication1
                     }
                     else
                     {
-                        SpokeInstruction df = new SpokeInstruction(SpokeInstructionType.CreateReference, rf.SetVars.Length) {DEBUG = "{}"};
+                        SpokeInstruction df = new SpokeInstruction(SpokeInstructionType.CreateReference, rf.SetVars.Length) { DEBUG = "{}" };
                         string name = "{";
-                        foreach (var spokeItem in rf.SetVars) {
+                        foreach (var spokeItem in rf.SetVars)
+                        {
                             name += spokeItem.Name + ",";
 
                             spokeItem.Index = cons.Variables.Add(spokeItem.Name,
@@ -2083,7 +2177,8 @@ namespace ConsoleApplication1
 
 
 
-                    if (!variableLookup.ContainsKey(cons.ClassName)) {
+                    if (!variableLookup.ContainsKey(cons.ClassName))
+                    {
                         variableLookup.Add(cons.ClassName, cons.Variables.allVariables.OrderBy(a => a.Item2).Select(a => a.Item1).ToArray());
                     }
 

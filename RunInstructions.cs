@@ -352,7 +352,18 @@ namespace ConsoleApplication1
 
                         break;
 
+                    case SpokeInstructionType.IfEqualsContinueAndPopElseGoto:
 
+                        if (SpokeObject.Compare(stack[stackIndex - 2],
+                                stack[stackIndex - 1]))
+                        {
+                            stackIndex = stackIndex - 2;
+                            continue;
+                        }
+
+				stackIndex = stackIndex - 1;
+				index = ins.Index;
+                        break;
                     case SpokeInstructionType.StoreToReference:
 
                         lastStack = stack[--stackIndex];

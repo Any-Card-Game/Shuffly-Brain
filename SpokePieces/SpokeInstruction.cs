@@ -103,6 +103,10 @@ namespace ConsoleApplication1
                 {
                     elseGuy = i;
                 }
+                else if (getLocal == SpokeInstructionType.IfEqualsContinueAndPopElseGoto)
+                {
+                    elseGuy = i;
+                }
                 else
                     if (getLocal == SpokeInstructionType.Label)
                     {
@@ -208,7 +212,8 @@ namespace ConsoleApplication1
 
                 case SpokeInstructionType.ArrayElem:
                     return 0;
-
+                case SpokeInstructionType. IfEqualsContinueAndPopElseGoto:
+                    return -1;
 
                 case SpokeInstructionType.IntConstant:
                 case SpokeInstructionType.BoolConstant:
@@ -323,6 +328,8 @@ namespace ConsoleApplication1
 
                 case SpokeInstructionType.StoreLocalRef:
                     return -1;
+                case SpokeInstructionType.IfEqualsContinueAndPopElseGoto:
+                    return 0;
 
                 case SpokeInstructionType.StoreFieldBool:
                 case SpokeInstructionType.StoreFieldInt:
@@ -539,7 +546,8 @@ namespace ConsoleApplication1
         AddRangeToArray,
         StoreArrayElem,
         CallMethodFunc,
-        Comment
+        Comment,
+        IfEqualsContinueAndPopElseGoto
     }
 
 

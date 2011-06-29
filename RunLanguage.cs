@@ -355,6 +355,9 @@ namespace ConsoleApplication1
                 case "def":
                     return new TokenDef();
                     break;
+                case "switch":
+                    return new TokenSwitch();
+                    break;
                 case "create":
                     return new TokenCreate();
                     break;
