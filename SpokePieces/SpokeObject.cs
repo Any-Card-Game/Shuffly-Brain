@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading;
 using System.Xml.Serialization;
@@ -12,36 +13,48 @@ namespace ConsoleApplication1
         Unset, Null, Int, Float, String, Bool, Array, Object, Method,
         Void
     }
-    [Serializable]
+    [DataContract]
     public class SpokeObjectMethod
     {
+        [DataMember]
         public bool HasYield;
+        [DataMember]
         public bool HasYieldReturn;
+        [DataMember]
         public bool HasReturn;
-        [XmlIgnore]
+        [IgnoreDataMember]
         public SpokeLine[] Lines;
-        [XmlIgnore]
+        [IgnoreDataMember]
         public ParamEter[] Parameters;
+        [DataMember]
         public SpokeInstruction[] Instructions;
-        [XmlIgnore]
+        [IgnoreDataMember]
         public SpokeVariable ReturnYield;
     }
-    [Serializable]
+    [DataContract]
     public class SpokeObject{
         private static int ids;
-        public int ID;
+        [DataMember] public int ID;
 
-
+        [DataMember]
         public int IntVal;
+        [DataMember]
         public string StringVal;
+        [DataMember]
         public bool BoolVal;
+        [DataMember]
         public float FloatVal;
+        [DataMember]
         public ObjectType Type;
+        [DataMember]
         public SpokeObject[] Variables;
+        [DataMember]
         public List<SpokeObject> ArrayItems;
+        [DataMember]
         public string ClassName;
-         
+         [DataMember]
         public SpokeObjectMethod AnonMethod;
+         [DataMember]
         public bool ByRef;
 
         public SpokeObject()

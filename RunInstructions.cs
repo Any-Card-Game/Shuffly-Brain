@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
@@ -50,141 +51,53 @@ namespace ConsoleApplication1
 
         }
 
-        private static List<StackTracer> stf;
-
         private string serialize()
         {
-            XmlSerializer sr = new XmlSerializer(typeof(List<StackTracer>));
-            StringWriter sw;
+            DataContractSerializer sr = new DataContractSerializer(typeof(List<StackTracer>), new List<Type>() { typeof(SpokeObject), typeof(StackTracer), typeof(SpokeObjectMethod) }, 64 * 1024, true,
+                                                                   true, null);
 
-            stf = stackTrace;
-            
-            var fs = new fixStackTracer(stackTrace.ToArray());
-            stackTrace = new List<StackTracer>(fs.Start(true));
 
-            sr.Serialize(sw = new StringWriter(), stackTrace);
-            return sw.ToString();
+            MemoryStream ms;
+            sr.WriteObject(ms=new MemoryStream(),stackTrace);
+            return ReadAll(ms);
         }
+
+        public string ReadAll(MemoryStream memStream)
+        {
+            // Reset the stream otherwise you will just get an empty string.
+            // Remember the position so we can restore it later.
+            dynamic pos = memStream.Position;
+            memStream.Position = 0;
+
+            StreamReader reader = new StreamReader(memStream);
+            dynamic str = reader.ReadToEnd();
+
+            // Reset the position so that subsequent writes are correct.
+            memStream.Position = pos;
+
+            return str;
+        }
+
+
+
         private void deserialize(string sz)
         {
-            XmlSerializer sr = new XmlSerializer(typeof(List<StackTracer>));
-            List<StackTracer> f = (List<StackTracer>)sr.Deserialize(new StringReader(sz));
+            DataContractSerializer sr = new DataContractSerializer(typeof(List<StackTracer>), new List<Type>() { typeof(SpokeObject), typeof(StackTracer), typeof(SpokeObjectMethod) }, 64 * 1024, true,
+                                                                   true, null);
+
+
+            ;
+
+            List<StackTracer> f = (List<StackTracer>)sr.ReadObject(new MemoryStream(Encoding.UTF8.GetBytes((sz))));
             reprintStackTrace = f.ToArray();
             reprintStackIndex = reprintStackTrace.Length;
 
-            var fs = new fixStackTracer(reprintStackTrace);
-            reprintStackTrace = fs.Start(false);
-
-            reprintStackTrace=stf.ToArray();
+ 
 
 
         }
 
-        class fixStackTracer
-        {
-            private readonly StackTracer[] myTc;
-            Dictionary<int, SpokeObject> ids = new Dictionary<int, SpokeObject>();
-            public fixStackTracer(StackTracer[] tc)
-            {
-                myTc = tc;
-            }
-
-            public StackTracer[] Start(bool d)
-            {
-
-                foreach (var stackTracer in myTc)
-                {
-                    for (int index = 0; index < stackTracer.StackObjects.Length; index++)
-                    {
-                        stackTracer.StackObjects[index] = getAllVariables(stackTracer.StackObjects[index], d);
-                    }
-                }
-
-
-                foreach (var stackTracer in myTc)
-                {
-                    for (int index = 0; index < stackTracer.StackObjects.Length; index++)
-                    {
-                        stackTracer.StackObjects[index] = getAllVariables(stackTracer.StackObjects[index], !d);
-                    }
-                }
-
-
-                return myTc;
-            }
-
-            private SpokeObject getAllVariables(SpokeObject so, bool check)
-            {
-                if (so == null) return null;
-
-                if (so.ArrayItems != null)
-                    for (int index = 0; index < so.ArrayItems.Count; index++)
-                    {
-                        so.ArrayItems[index] = getAllVariables(so.ArrayItems[index], check);
-                    }
-                if (so.Variables != null)
-                    for (int index = 0; index < so.Variables.Length; index++)
-                    {
-
-                        so.Variables[index] = getAllVariables(so.Variables[index], check);
-                    }
-                so = this.check(so, check);
-                return so;
-            }
-
-            private SpokeObject check(SpokeObject so, bool check)
-            {
-                SpokeObject f;
-                if (ids.TryGetValue(so.ID, out f))
-                {
-                    if (check)
-                    {
-                        if (f.Equals(so))
-                        {
-                            return f;
-                        }
-                        else
-                        {
-                            return so;
-                        }
-                    }
-
-                    if (!so.Compare(f))
-                        return f;
-                    else
-                    {
-
-                        if (so.ArrayItems != null)
-                        {
-                            if (so.ArrayItems.Equals(f.ArrayItems))
-                            {
-                                return f;
-                            }
-                            else {
-                                so.ArrayItems = f.ArrayItems;
-                                return f;
-                            }
-                        }
-                        if (so.Variables != null)
-                        {
-                            if (so.Variables.Equals(f.Variables))
-                            {
-                                return f;
-                            }
-                            else
-                            {
-                                so.Variables = f.Variables;
-                                return f;
-                            }
-                        }
-                        return f;
-                    }
-                }
-                ids.Add(so.ID, so);
-                return so;
-            }
-        }
-
+ 
 
         public Tuple<SpokeQuestion, string, GameBoard> Run(SpokeConstruct so)
         {
@@ -225,13 +138,18 @@ namespace ConsoleApplication1
             }
             return new SpokeObject(ObjectType.Int) { IntVal = index };
         }
-        [Serializable]
+        [DataContract]
         public class StackTracer
         {
+            [DataMember]
             public SpokeObject[] StackObjects;
+            [DataMember]
             public SpokeObject[] StackVariables;
+            [DataMember]
             public int InstructionIndex;
+            [DataMember]
             public int StackIndex;
+            [DataMember]
             public SpokeObject Answer;
 
             public StackTracer(SpokeObject[] stack, SpokeObject[] variables)
