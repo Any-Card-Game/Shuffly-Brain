@@ -576,18 +576,18 @@ namespace ConsoleApplication1
             var userAreas = getVariableByName(spokeObject, "userAreas");
 
 
-            gb.MainArea = buildArea(mainArea);
+            gb.MainArea = buildArea(mainArea, getVariableByName(spokeObject, "piles"));
             gb.UserAreas=new List<TableArea>();
             foreach (var area in userAreas.ArrayItems)
             {
-                gb.UserAreas.Add(buildArea(area));
+                gb.UserAreas.Add(buildArea(area, getVariableByName(spokeObject, "piles")));
 
             }
 
             return gb;
         }
 
-        private TableArea buildArea(SpokeObject mainArea)
+        private TableArea buildArea(SpokeObject mainArea,SpokeObject cardgamePiles)
         {
             var tca = new TableArea();
             tca.Dimensions = getRect(getVariableByName(mainArea, "dimensions"));
@@ -609,8 +609,19 @@ namespace ConsoleApplication1
                 ts.Name = getVariableByName(space, "name").StringVal;
                 ts.StackCards = getVariableByName(space, "stackCards").BoolVal;
                 ts.Cards = new List<Card>();
-                foreach (var card in getVariableByName(space, "pile").ArrayItems)
-                    ts.Cards.Add(new Card(getVariableByName(card, "Value").IntVal, getVariableByName(card, "Type").IntVal));
+
+                foreach (var cardgamePile in cardgamePiles.ArrayItems) {
+                    if (getVariableByName(cardgamePile, "Name").StringVal == getVariableByName(space, "pileName").StringVal) {
+
+
+                        foreach (var card in getVariableByName(cardgamePile, "Cards").ArrayItems)
+                            ts.Cards.Add(new Card(getVariableByName(card, "Value").IntVal, getVariableByName(card, "Type").IntVal));
+
+                        
+                        break;
+                    }
+                }
+
             }
 
 

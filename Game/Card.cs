@@ -6,9 +6,13 @@ namespace ConsoleApplication1.Game
 {
     public class Card
     {
-        public Card(int number, int type) {
+        public Card(int number, int type)
+        {
             CardType = type;
             CardNumber = number;
+        }
+        public Card()
+        {
         }
 
         public int CardNumber { get; set; }

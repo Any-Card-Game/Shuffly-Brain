@@ -91,7 +91,7 @@ namespace ConsoleApplication1
                         case SpokeMessageType.AskQuestion:
                             return;
                         case SpokeMessageType.JoinGame:
-                            playersInGame.Add(receiveArgs.PublishingClient.Id,payload.PlayerName);
+                            playersInGame.Add(receiveArgs.PublishingClient.Id, payload.PlayerName);
                             if (playersInGame.Count == 2)
                             {
                                 vf = RunGame.StartGame("sevens", playersInGame);
@@ -107,60 +107,66 @@ namespace ConsoleApplication1
                         default:
                             throw new ArgumentOutOfRangeException();
                     }
-                    
 
-
-                    PublicationArgs fc = new PublicationArgs
+                    PublicationArgs fc;
+                    foreach (KeyValuePair<string, string> user in playersInGame)
                     {
-                        Publication = new Publication
+                        fc = new PublicationArgs
                         {
-                            Channel = channel ,
-                            DataJson = JSON.Serialize(vf.Item3)
-                        },
-                        OnComplete = (completeArgs) =>
-                        {
-                            if (completeArgs.Publication.Successful == true)
+                            Publication = new Publication
                             {
-                                Console.WriteLine("The publisher published to " + channel + ".");
-                            }
-                            else
+                                Channel = channel + "/gamedata/" + user.Value,
+                                DataJson = JSON.Serialize(vf.Item3)
+                            },
+                            OnComplete = (completeArgs) =>
                             {
-                                Console.WriteLine("The publisher could not publish to " + channel + "... " + completeArgs.Publication.Error);
+                                if (completeArgs.Publication.Successful == true)
+                                {
+                                    Console.WriteLine("The publisher published to " + channel +
+                                                      ".");
+                                }
+                                else
+                                {
+                                    Console.WriteLine("The publisher could not publish to " +
+                                                      channel + "... " +
+                                                      completeArgs.Publication.Error);
+                                }
+                            },
+                            OnException = (exceptionArgs) =>
+                            {
+                                Console.WriteLine("The publisher threw an exception... " +
+                                                  exceptionArgs.Exception.Message);
                             }
-                        },
-                        OnException = (exceptionArgs) =>
-                        {
-                            Console.WriteLine("The publisher threw an exception... " + exceptionArgs.Exception.Message);
-                        }
-                    };
-                    publisher.Publish(fc);
+                        };
+                        publisher.Publish(fc);
+                    }
 
 
                     SpokeQuestion q = vf.Item1;
 
-                     fc = new PublicationArgs
-                    {
-                        Publication = new Publication
-                        {
-                            Channel = channel+"/"+q.User,
-                            DataJson = JSON.Serialize(new Payload(q.Question, q.Answers))
-                        },
-                        OnComplete = (completeArgs) =>
-                        {
-                            if (completeArgs.Publication.Successful == true)
-                            {
-                                Console.WriteLine("The publisher published to " + channel + ".");
-                            }
-                            else
-                            {
-                                Console.WriteLine("The publisher could not publish to " + channel + "... " + completeArgs.Publication.Error);
-                            }
-                        },
-                        OnException = (exceptionArgs) =>
-                        {
-                            Console.WriteLine("The publisher threw an exception... " + exceptionArgs.Exception.Message);
-                        }
-                    };
+                    fc = new PublicationArgs
+                         {
+                             Publication = new Publication
+                                           {
+                                               Channel = channel + "/" + q.User,
+                                               DataJson = JSON.Serialize(new Payload(q.Question, q.Answers))
+                                           },
+                             OnComplete = (completeArgs) =>
+                                          {
+                                              if (completeArgs.Publication.Successful == true)
+                                              {
+                                                  Console.WriteLine("The publisher published to " + channel + ".");
+                                              }
+                                              else
+                                              {
+                                                  Console.WriteLine("The publisher could not publish to " + channel + "... " + completeArgs.Publication.Error);
+                                              }
+                                          },
+                             OnException = (exceptionArgs) =>
+                                           {
+                                               Console.WriteLine("The publisher threw an exception... " + exceptionArgs.Exception.Message);
+                                           }
+                         };
                     publisher.Publish(fc);
 
 
@@ -181,7 +187,7 @@ namespace ConsoleApplication1
                 }
                 if (consoleKeyInfo.Key == ConsoleKey.Enter)
                 {
-                     
+
                 }
             }
 
@@ -210,7 +216,8 @@ namespace ConsoleApplication1
 
         }
 
-        public Payload(string question, string[] answers) {
+        public Payload(string question, string[] answers)
+        {
             Type = SpokeMessageType.AskQuestion;
             Question = question;
             Answers = answers;
@@ -222,6 +229,6 @@ namespace ConsoleApplication1
     {
         JoinGame = 0,
         AnswerQuestion = 1,
-        AskQuestion=2
+        AskQuestion = 2
     }
 }
