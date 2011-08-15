@@ -54,11 +54,11 @@ namespace ConsoleApplication1
         private string serialize()
         {
             DataContractSerializer sr = new DataContractSerializer(typeof(List<StackTracer>), new List<Type>() { typeof(SpokeObject), typeof(StackTracer), typeof(SpokeObjectMethod) }, 64 * 1024, true,
-                                                                   true, null);
+                                                                    true, null);
 
 
             MemoryStream ms;
-            sr.WriteObject(ms=new MemoryStream(),stackTrace);
+            sr.WriteObject(ms = new MemoryStream(), stackTrace);
             return ReadAll(ms);
         }
 
@@ -70,7 +70,7 @@ namespace ConsoleApplication1
             memStream.Position = 0;
 
             StreamReader reader = new StreamReader(memStream);
-            dynamic str = reader.ReadToEnd();
+            var str = reader.ReadToEnd();
 
             // Reset the position so that subsequent writes are correct.
             memStream.Position = pos;
@@ -92,12 +92,12 @@ namespace ConsoleApplication1
             reprintStackTrace = f.ToArray();
             reprintStackIndex = reprintStackTrace.Length;
 
- 
+
 
 
         }
 
- 
+
 
         public Tuple<SpokeQuestion, string, GameBoard> Run(SpokeConstruct so)
         {
@@ -663,15 +663,8 @@ namespace ConsoleApplication1
                 ts.StackCards = getVariableByName(space, "stackCards").BoolVal;
                 ts.Cards = new List<Card>();
 
-                foreach (var cardgamePile in cardgamePiles.ArrayItems)
-                {
-                    if (getVariableByName(cardgamePile, "Name").StringVal == getVariableByName(space, "pileName").StringVal)
-                    {
-                        foreach (var card in getVariableByName(cardgamePile, "Cards").ArrayItems)
-                            ts.Cards.Add(new Card(getVariableByName(card, "Value").IntVal, getVariableByName(card, "Type").IntVal, getVariableByName(card, "CardName").StringVal));
-                        break;
-                    }
-                }
+                foreach (var card in getVariableByName(getVariableByName(space, "pile"), "Cards").ArrayItems)
+                    ts.Cards.Add(new Card(getVariableByName(card, "Value").IntVal, getVariableByName(card, "Type").IntVal, getVariableByName(card, "CardName").StringVal));
 
             }
 

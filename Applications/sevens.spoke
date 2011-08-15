@@ -1,4 +1,4 @@
-﻿macro ;clone &;=>|(rrb)
+﻿macro ;clonearray &;=>|(rrb)
 	rrb=>|(a89)
 		yield (a89)
 		
@@ -67,20 +67,10 @@ class Main
 		cardgame.mainArea.numberOfCardsVertical=13
 		cardgame.mainArea.dimensions=create Rectangle(){x=150,y=160,width=640,height=350}
 		
-		clubsSpace=create TableSpace(){visible=true,stack=false,name="Clubs",xPosition=0,yPosition=0,width=0,height=13,rotateAngle=0-90,pileName="clubs"}
-		cardgame.mainArea.spaces.add(clubsSpace)
-		
-
-		heartsSpace=create TableSpace(){visible=true,stack=false,name="Hearts",xPosition=1,yPosition=0,width=0,height=13,rotateAngle=0-90,pileName="hearts"}
-		cardgame.mainArea.spaces.add(heartsSpace)
-		
-
-		diamondsSpace=create TableSpace(){visible=true,stack=false,name="Diamonds",xPosition=2,yPosition=0,width=0,height=13,rotateAngle=0-90,pileName="diamonds"}
-		cardgame.mainArea.spaces.add(diamondsSpace)
-		
-
-		spadesSpace=create TableSpace(){visible=true,stack=false,name="Spades",xPosition=3,yPosition=0,width=0,height=13,rotateAngle=0-90,pileName="spades"}
-		cardgame.mainArea.spaces.add(spadesSpace)
+		cardgame.mainArea.spaces.add(create TableSpace(){visible=true,stack=false,name="Clubs",xPosition=0,yPosition=0,width=0,height=13,rotateAngle=0-90,pile=clubs})
+		cardgame.mainArea.spaces.add(create TableSpace(){visible=true,stack=false,name="Hearts",xPosition=1,yPosition=0,width=0,height=13,rotateAngle=0-90,pile=hearts})
+		cardgame.mainArea.spaces.add(create TableSpace(){visible=true,stack=false,name="Diamonds",xPosition=2,yPosition=0,width=0,height=13,rotateAngle=0-90,pile=diamonds})
+		cardgame.mainArea.spaces.add(create TableSpace(){visible=true,stack=false,name="Spades",xPosition=3,yPosition=0,width=0,height=13,rotateAngle=0-90,pile=spades})
 		
 		cardgame.mainArea.textAreas.add(create TableTextArea(){name="SpadesText",xPosition=0,yPosition=0,text="Clubs",rotateAngle=0-90})
 		cardgame.mainArea.textAreas.add(create TableTextArea(){name="ClubsText",xPosition=1,yPosition=0,text="Hearts",rotateAngle=0-90})
@@ -89,16 +79,13 @@ class Main
 		
 		sorter=|(left,right)=>
 			return left.Value>right.Value
-
-		u=runGame()
-
-		writeLine(u.Name,"Is the winner!")
+		runGame()
 
 
 	def shuffle(arbs)
 	
 		indes=0
-		vafb=clone arbs 
+		vafb=clonearray arbs 
 
 		arbs=>|(fs)
 			vm=nextRandom(0,vafb.length())
@@ -154,7 +141,7 @@ class Main
 
 		cardgame.users=>|(u,ind)
 			yc=createUser(ind,u.Name)
-			yc.spaces[0].pileName="User"+ind
+			yc.spaces[0].pile=u.Cards
 			cardgame.userAreas.add(yc)
 
 		(cardgame.deck.length()>0)=>
@@ -164,16 +151,6 @@ class Main
 					cardgame.deck.remove(cardgame.deck[0])
 		cardgame.users=>|(u)
 			u.Cards.Cards=sortArray(u.Cards.Cards,sorter)
-		 
-
-		cardgame.piles.clear()
-		cardgame.piles.add(this.spades)
-		cardgame.piles.add(this.clubs)
-		cardgame.piles.add(this.diamonds)
-		cardgame.piles.add(this.hearts)
-		
-		cardgame.users=>|(ut)
-			cardgame.piles.add(ut.Cards)
 
 
 		CardTypes=["","Hearts","Clubs","Diamonds","Spades"]
@@ -309,7 +286,7 @@ class TableSpace
 	yPosition=0
 	width=1
 	height=1
-	pileName=""
+	pile={}
 
 class TableTextArea
 	name=""
