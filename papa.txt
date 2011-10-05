@@ -1,0 +1,114 @@
+﻿document=(item,newline)..
+
+item=word + "=" + piece
+
+piece = pieceWrap | pieceKernalOr	
+
+pieceKernalOr=(pieceKernalAddition,"|")..
+
+pieceKernalAddition=(pieceContent,"+")..
+
+pieceContent=(word|string|peice)
+
+pieceWrap=(pieceInformation+(pieceExtras)?)
+
+pieceExtras="?" | ".."
+
+pieceInformation=justPiece| pieceWithparam
+
+justPiece="("+piece+")"
+
+pieceWithParam="("+piece+","+piece+")"
+
+
+
+class = "class" + variable + extends? +(newLine+(indent+method|indent+assignment)).. 
+
+extends=(":"+(variable,",")..)
+
+method="def" +(variable)?+ "("+(variable + ",").. + ")" + block 
+
+block= (newLine+ indent + statement).. 
+
+statement = assignment | switch | if | methodCall | anonFunction 
+
+assignment = variablePiece + "=" + anything
+
+switch = "switch"+variable + (newLine + indent + native+":" + block)..
+
+if = ifelseif | 
+     ifelse |
+     justif
+
+ifelseif="if"+anything + block+ "else"+"if"+anything + block 
+
+ifElse= "if"+anything + block+ "else" + block 
+
+justif="if"+anything + block
+
+methodCall = normalmethodcall | anonmethodcall
+
+normalmethodcall=(variablePiece + "(" + (anything, ",").. + ")")
+
+anonmethodcall=anonFunction + "(" + (anything,  ",").. + ")" 
+
+objproperty=anything + "."+variable
+
+anonFunction = anything + "=>" + anonVariables
+
+anonVariables= anonVariablesWithVars| block
+
+anonVariablesWithVars="|" + "(" +(variable, ",")..+")" + block 
+
+anything = anonFunction | 
+           array |
+           methodCall |
+           "(" + anything + ")" |
+         anythingEquals  |
+        anythingLessThanE   |
+       anythingGreaterThanE   |
+      anythingLessThan |
+        anythingGreaterThan  |
+        anythingPlus  |
+          anythingMinus |
+        anythingMultiply  |
+        anythingDivide  |
+           variablePiece |
+           native |
+           create 
+
+anythingEquals=anything + "==" + anything
+
+anythingLessThanE= anything + "<=" + anything
+
+anythingGreaterThanE= anything + ">=" + anything 
+
+anythingLessThan=    anything + "<" + anything 
+
+anythingGreaterThan= anything + ">" + anything 
+
+anythingPlus= anything + "+" + anything 
+
+anythingMinus=anything + "-" + anything 
+
+anythingMultiply= anything + "*" + anything 
+
+anythingDivide=  anything + "/" + anything
+
+array = anything + "["+anything+"]"
+            
+variablePiece= objproperty |variable
+
+variable = word
+
+create = createVariables | createVars | createConstruct | createBare 
+
+createBare = "create" + variable
+
+createConstruct = createBare + "(" + (anything , ",").. + ")" 
+
+createVars= createConstruct + createVariables
+
+createVariables= "{" + (variable + "="+ anything , ",").. + "}"
+
+native = number | string | bool 

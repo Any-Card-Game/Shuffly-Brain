@@ -3,42 +3,183 @@
     <string />
     <integer />
     <boolean>
+      <setting name="livetemplates.csharp.usevar">True</setting>
       <setting name="SolutionAnalysisEnabled">False</setting>
     </boolean>
   </SettingsComponent>
   <CompletionStatisticsManager>
     <ItemStatistics item="Default">
-      <Item value="public" priority="0" />
-      <Item value="void" priority="0" />
+      <Item value="public" priority="8" />
+      <Item value="void" priority="2" />
       <Item value="RunGame`0" priority="0" />
       <Item value="using" priority="0" />
       <Item value="System" priority="0" />
       <Item value="Runtime" priority="0" />
       <Item value="Serialization" priority="0" />
       <Item value="Json" priority="0" />
+      <Item value="string" priority="8" />
+      <Item value="input" priority="1" />
+      <Item value="char" priority="4" />
+      <Item value="class" priority="0" />
+      <Item value="for" priority="0" />
+      <Item value="Input" priority="2" />
+      <Item value="if" priority="28" />
+      <Item value="i" priority="3" />
+      <Item value="IEnumerable" priority="0" />
+      <Item value="List" priority="0" />
+      <Item value="new" priority="5" />
+      <Item value="List&lt;string&gt;" priority="0" />
+      <Item value="return" priority="10" />
+      <Item value="sts" priority="2" />
+      <Item value="bool" priority="10" />
+      <Item value="false" priority="7" />
+      <Item value="inString" priority="2" />
+      <Item value="else" priority="9" />
+      <Item value="null" priority="0" />
+      <Item value="Distinct`1" priority="0" />
+      <Item value="foreach" priority="0" />
+      <Item value="switch" priority="0" />
+      <Item value="v" priority="8" />
+      <Item value="case" priority="0" />
+      <Item value="toks" priority="0" />
+      <Item value="Contains`1" priority="0" />
+      <Item value="yield return" priority="3" />
+      <Item value="continue" priority="5" />
+      <Item value="cur" priority="6" />
+      <Item value="ital" priority="0" />
+      <Item value="lastTok" priority="0" />
+      <Item value="var" priority="0" />
+      <Item value="inStr" priority="1" />
+      <Item value="s_" priority="0" />
+      <Item value="Dictionary" priority="0" />
+      <Item value="Guid`0" priority="3" />
+      <Item value="Dictionary&lt;Guid,int&gt;" priority="0" />
+      <Item value="tracking" priority="2" />
+      <Item value="PieceTokenizer`0" priority="1" />
+      <Item value="charz" priority="2" />
+      <Item value="f" priority="13" />
+      <Item value="curIndex" priority="4" />
+      <Item value="g" priority="0" />
+      <Item value="s" priority="1" />
+      <Item value="isItem`0" priority="0" />
+      <Item value="pieceTokenizer" priority="16" />
+      <Item value="ParallelEnumerable`0" priority="0" />
+      <Item value="int" priority="1" />
+      <Item value="Boolean`0" priority="1" />
+      <Item value="isBool`0" priority="0" />
+      <Item value="isWord`0" priority="2" />
+      <Item value="fc" priority="1" />
+      <Item value="advance" priority="2" />
+      <Item value="isToken`0" priority="8" />
+      <Item value="good" priority="4" />
+      <Item value="true" priority="4" />
+      <Item value="isPiece`0" priority="0" />
+      <Item value="isString`0" priority="1" />
+      <Item value="while" priority="2" />
+      <Item value="break" priority="2" />
+      <Item value="isPieceOr1`0" priority="1" />
+      <Item value="g1" priority="1" />
+      <Item value="Console`0" priority="0" />
+      <Item value="throw" priority="0" />
+      <Item value="Exception" priority="0" />
+      <Item value="wasNewLine" priority="0" />
+      <Item value="SerializableAttribute`0" priority="0" />
+      <Item value="Length" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:@System.IO.File">
+      <Item value="ReadAllText`0" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.String">
+      <Item value="Length" priority="0" />
+      <Item value="Substring`0" priority="0" />
+      <Item value="StartsWith`0" priority="0" />
+      <Item value="EndsWith`0" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Collections.Generic.List`1">
+      <Item value="ToArray`0" priority="0" />
+      <Item value="Add`0" priority="1" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Char">
+      <Item value="ToString`0" priority="2" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Collections.Generic.IEnumerable`1">
+      <Item value="ToArray`1" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Collections.Generic.Dictionary`2">
+      <Item value="Add`0" priority="0" />
+      <Item value="Remove`0" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:@System.Guid">
+      <Item value="NewGuid`0" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:ConsoleApplication1.HeartParser+PieceTokenizer">
+      <Item value="reStart`0" priority="0" />
+      <Item value="GetNextPiece`0" priority="0" />
+      <Item value="PeakNextPiece`0" priority="2" />
+      <Item value="Progress`0" priority="2" />
+      <Item value="goBack`0" priority="1" />
+      <Item value="CurrentPiece`0" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:@System.Boolean">
+      <Item value="TryParse`0" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:@System.Console">
+      <Item value="Write`0" priority="0" />
     </ItemStatistics>
   </CompletionStatisticsManager>
   <RecentFiles>
     <RecentFiles>
-      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/d:Applications/f:sevens.spoke" caret="0" fromTop="0" />
-      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/f:RunInstructions.cs" caret="2480" fromTop="22" />
-      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/f:RunApp.cs" caret="6466" fromTop="180" />
-      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/f:RunGame.cs" caret="37573" fromTop="98" />
-      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/f:Program.cs" caret="3129" fromTop="11" />
+      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/f:RunInstructions.cs" caret="17555" fromTop="13" />
+      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/f:PreparseExpressions.cs" caret="54629" fromTop="146" />
+      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/d:SpokePieces/f:SpokeVariableInfo.cs" caret="1088" fromTop="13" />
+      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/d:SpokePieces/f:Tokens.cs" caret="587" fromTop="8" />
+      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/d:Applications/f:realSimple.spoke" caret="0" fromTop="0" />
+      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/d:Applications/f:simple.spoke" caret="0" fromTop="0" />
+      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/d:Applications/f:easy.spoke" caret="35" fromTop="0" />
+      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/d:Applications/f:Tester.spoke" caret="304" fromTop="12" />
+      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/f:RunGame.cs" caret="33631" fromTop="29" />
+      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/f:finiteState.txt" caret="421" fromTop="26" />
+      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/f:BuildFile.cs" caret="0" fromTop="0" />
+      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/d:Applications/f:easy2.spoke" caret="126" fromTop="11" />
+      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/f:RunLanguage.cs" caret="14820" fromTop="2" />
+      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/f:BuildExpressions.cs" caret="0" fromTop="0" />
+      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/f:Program.cs" caret="599" fromTop="20" />
+      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/d:Applications/f:sevens.spoke" caret="794" fromTop="15" />
+      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/f:HeartParser.cs" caret="4926" fromTop="0" />
+      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/f:RunApp.cs" caret="786" fromTop="23" />
+      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/f:papa.txt" caret="287" fromTop="14" />
     </RecentFiles>
     <RecentEdits>
-      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/f:Program.cs" caret="229" fromTop="6" />
-      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/f:Program.cs" caret="345" fromTop="13" />
-      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/f:Program.cs" caret="5119" fromTop="16" />
-      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/f:Program.cs" caret="5083" fromTop="16" />
-      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/f:Program.cs" caret="3379" fromTop="18" />
-      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/f:RunGame.cs" caret="1350" fromTop="27" />
-      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/f:RunGame.cs" caret="2408" fromTop="21" />
-      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/f:RunGame.cs" caret="3046" fromTop="14" />
-      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/f:RunGame.cs" caret="28429" fromTop="2" />
-      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/f:RunGame.cs" caret="29124" fromTop="0" />
-      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/f:RunGame.cs" caret="34419" fromTop="14" />
-      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/f:RunGame.cs" caret="37573" fromTop="23" />
+      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/f:papa.txt" caret="2630" fromTop="22" />
+      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/f:papa.txt" caret="2630" fromTop="40" />
+      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/f:HeartParser.cs" caret="9156" fromTop="19" />
+      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/f:HeartParser.cs" caret="9156" fromTop="26" />
+      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/f:HeartParser.cs" caret="9156" fromTop="10" />
+      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/f:HeartParser.cs" caret="8443" fromTop="19" />
+      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/f:HeartParser.cs" caret="7366" fromTop="12" />
+      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/f:HeartParser.cs" caret="9162" fromTop="29" />
+      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/f:HeartParser.cs" caret="9008" fromTop="21" />
+      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/f:papa.txt" caret="2630" fromTop="6" />
+      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/f:HeartParser.cs" caret="7079" fromTop="0" />
+      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/f:HeartParser.cs" caret="7079" fromTop="7" />
+      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/f:HeartParser.cs" caret="7079" fromTop="0" />
+      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/f:HeartParser.cs" caret="7079" fromTop="30" />
+      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/f:HeartParser.cs" caret="7079" fromTop="30" />
+      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/f:HeartParser.cs" caret="840" fromTop="19" />
+      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/f:HeartParser.cs" caret="1411" fromTop="24" />
+      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/f:HeartParser.cs" caret="1997" fromTop="14" />
+      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/f:HeartParser.cs" caret="1591" fromTop="13" />
+      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/f:HeartParser.cs" caret="2127" fromTop="30" />
+      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/f:HeartParser.cs" caret="1861" fromTop="21" />
+      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/f:HeartParser.cs" caret="7079" fromTop="24" />
+      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/f:HeartParser.cs" caret="1228" fromTop="18" />
+      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/f:HeartParser.cs" caret="1228" fromTop="0" />
+      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/f:papa.txt" caret="2630" fromTop="40" />
+      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/f:papa.txt" caret="0" fromTop="0" />
+      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/f:papa.txt" caret="2630" fromTop="4" />
+      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/f:HeartParser.cs" caret="4926" fromTop="5" />
+      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/f:HeartParser.cs" caret="4926" fromTop="0" />
+      <File id="F513DBCB-EF49-4004-BD3C-F5FD5FE204B0/f:papa.txt" caret="2630" fromTop="40" />
     </RecentEdits>
   </RecentFiles>
   <NAntValidationSettings>

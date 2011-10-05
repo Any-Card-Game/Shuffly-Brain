@@ -297,6 +297,10 @@ namespace ConsoleApplication1
 			}
 		}
 
+        
+	 
+
+
 		public Spoke eval(TokenEnumerator enumerator, int tabIndex, evalInformation inf)
 		{
 			if (inf.ResetCurrentVal)

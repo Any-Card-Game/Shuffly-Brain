@@ -66,6 +66,7 @@
     <Compile Include="Game\TableArea.cs" />
     <Compile Include="Game\TableSpace.cs" />
     <Compile Include="Game\TableTextArea.cs" />
+    <Compile Include="HeartParser.cs" />
     <Compile Include="RunGame.cs" />
     <Compile Include="SpokeQuestion.cs" />
     <Compile Include="SpokePieces\SpokeVariableInfo.cs" />
@@ -136,6 +137,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="papa.txt" />
     <Content Include="finiteState.txt" />
   </ItemGroup>
   <ItemGroup />

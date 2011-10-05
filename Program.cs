@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.IO;
 using System.Runtime.Serialization;
 using System.Threading;
 using ConsoleApplication1.Game;
@@ -15,8 +16,16 @@ namespace ConsoleApplication1
         private static Dictionary<string, string> playersInGame = new Dictionary<string, string>();
         private static string stackTrace;
 
-        static void Main(string[] args)
-        {
+        private static void parseParse(string input) {
+            new HeartParser(input).Run();
+        }
+
+        static void Main(string[] args) {
+
+
+            parseParse(File.ReadAllText(@"C:\shuffly\Shuffly-Brain\papa.txt"));
+
+
             string channel = "/consolepublisher";
             Console.WriteLine("Initializing...");
 
@@ -65,6 +74,7 @@ namespace ConsoleApplication1
                 return;
             }
 
+            Console.WriteLine("Connected");
             client.Subscribe(new SubscribeArgs
             {
                 Channel = channel,
@@ -195,8 +205,10 @@ namespace ConsoleApplication1
 
 
         }
+
     }
 
+    
     [DataContract]
     public class Payload
     {

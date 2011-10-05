@@ -63,14 +63,10 @@ class Main
 
 
 	def ()
-		cardgame.mainArea.numberOfCardsHorizontal=4
-		cardgame.mainArea.numberOfCardsVertical=13
-		cardgame.mainArea.dimensions=create Rectangle(){x=150,y=160,width=640,height=350}
-		
-		cardgame.mainArea.spaces.add(create TableSpace(){visible=true,stack=false,name="Clubs",xPosition=0,yPosition=0,width=0,height=13,rotateAngle=0-90,pile=clubs})
-		cardgame.mainArea.spaces.add(create TableSpace(){visible=true,stack=false,name="Hearts",xPosition=1,yPosition=0,width=0,height=13,rotateAngle=0-90,pile=hearts})
-		cardgame.mainArea.spaces.add(create TableSpace(){visible=true,stack=false,name="Diamonds",xPosition=2,yPosition=0,width=0,height=13,rotateAngle=0-90,pile=diamonds})
-		cardgame.mainArea.spaces.add(create TableSpace(){visible=true,stack=false,name="Spades",xPosition=3,yPosition=0,width=0,height=13,rotateAngle=0-90,pile=spades})
+		cardgame.mainArea.pilePaths.add(create TablePilePath(){visible=true,stack=false,name="Clubs",xPosition=0,yPosition=0,width=0,height=13,rotateAngle=0-90,pile=clubs})
+		cardgame.mainArea.pilePaths.add(create TablePilePath(){visible=true,stack=false,name="Hearts",xPosition=1,yPosition=0,width=0,height=13,rotateAngle=0-90,pile=hearts})
+		cardgame.mainArea.pilePaths.add(create TablePilePath(){visible=true,stack=false,name="Diamonds",xPosition=2,yPosition=0,width=0,height=13,rotateAngle=0-90,pile=diamonds})
+		cardgame.mainArea.pilePaths.add(create TablePilePath(){visible=true,stack=false,name="Spades",xPosition=3,yPosition=0,width=0,height=13,rotateAngle=0-90,pile=spades})
 		
 		cardgame.mainArea.textAreas.add(create TableTextArea(){name="SpadesText",xPosition=0,yPosition=0,text="Clubs",rotateAngle=0-90})
 		cardgame.mainArea.textAreas.add(create TableTextArea(){name="ClubsText",xPosition=1,yPosition=0,text="Hearts",rotateAngle=0-90})
@@ -105,7 +101,7 @@ class Main
 			4:
 				ua.numberOfCardsHorizontal=-1
 				ua.numberOfCardsVertical=4
-				ua.spaces.add(create TableSpace(){visible=true,stack=false,name="User"+userIndex,xPosition=0,yPosition=1,width=-1,height=1,bend=true,rotateAngle=0})
+				ua.pilePaths.add(create TableSpace(){visible=true,stack=false,name="User"+userIndex,xPosition=0,yPosition=1,width=-1,height=1,bend=true,rotateAngle=0})
 				ua.textAreas.add(create TableTextArea(){name="Text"+userIndex,xPosition=1,yPosition=0,text=text})
 			2:
 			5:
@@ -116,7 +112,7 @@ class Main
 					rotate=90
 				else
 					rotate=-90
-				ua.spaces.add(create TableSpace(){visible=true,stack=false,name="User"+userIndex,xPosition=1,yPosition=0,width=1,height=-1,bend=true,rotateAngle=rotate})
+				ua.pilePaths.add(create TableSpace(){visible=true,stack=false,name="User"+userIndex,xPosition=1,yPosition=0,width=1,height=-1,bend=true,rotateAngle=rotate})
 				ua.textAreas.add(create TableTextArea(){name="Text"+userIndex,xPosition=0,yPosition=1,text=text}) 
 
 		switch userIndex
@@ -141,7 +137,7 @@ class Main
 
 		cardgame.users=>|(u,ind)
 			yc=createUser(ind,u.Name)
-			yc.spaces[0].pile=u.Cards
+			yc.pilePaths[0].pile=u.Cards
 			cardgame.userAreas.add(yc)
 
 		(cardgame.deck.length()>0)=>
@@ -227,24 +223,7 @@ class Main
 		
 		return ar
 
-class CardGame
-	users=[]
-	deck=[]
-	piles=[]
-	mainArea=create TableArea()
-	userAreas=[]
-	def ()
-		userAreas.add(create TableArea())
-		userAreas.clear()
-		[1>>4]=>|(am)
-			[1>>13]=>|(ab)
-				deck.add(create Card(ab,am))
-		this.users.add({Cards=create Pile(""),Name=""})
-		this.users.clear()
 
-		populateUsers()=>|(n,ind)
-			this.users.add({Name=n,Cards=create Pile("User"+ind)})
-		write(this.users.length())
 
 
 class Pile
@@ -262,49 +241,92 @@ class Card
 	Value=0
 	Type=0
 	CardName=""
+	effects=type Effect[]
+	
 	def (v,t)
 		Value=v
 		Type=t
+
 		CardTypes=["","Hearts","Clubs","Diamonds","Spades"]
 		CardNames=["","Ace","Deuce","Three","Four","Five","Six","Seven","Eight","Nine","Ten","Jack","Queen","King"]
 		CardName=CardNames[Value]+CardTypes[Type]
+		
+		
+class CardGameManager
+	users=type User[]
+	deck=type Card[]
+	piles=type Pile[]
+	mainArea=create TableArea()
+	userAreas=type TableArea[]
+	def ()
+		[1>>4]=>|(am)
+			[1>>13]=>|(ab)
+				deck.add(create Card(ab,am))
+		
+		populateUsers()=>|(n,ind)
+			this.users.add({Name=n,Cards=create Pile("User"+ind)})
+		write(this.users.length())
+		
+class CardLayoutManager
+	pilePaths=type LayoutPilePath[]
+		
+
+class LayoutManager
+	images=type ScreenImage[]
+	textAreas=type LayoutTextArea[]
 
 
-class TableArea
-	numberOfCardsHorizontal=1
-	numberOfCardsVertical=1
-	dimensions=create Rectangle()
-	spaces=[]
-	textAreas=[]
 
-class TableSpace
+template ScreenImage
+	effect=type Effect[]
+	x=0
+	y=0
+	image=""
+		rotation=0
+
+
+
+class CardImage : ScreenImage
+		card=type Card
+	def() 
+	
+template Effect
+	effectType=type EffectType
+
+class RotateEffect : Effect
+	RotateAmount=0
+	relative=false
+		
+class MoveEffect : Effect
+	X=0
+	Y=0
+	relative=false
+		
+class HighlightEffect : Effect
+	width=0
+	color=type Color
+	
+enum EffectType
+	Rotate=1
+	Highlight=2
+	Move=3
+
+class LayoutPilePath
 	visible=true
-	stackCards=true
+	stackCards=false
 	drawCardsBent=false
-	name=""
-	xPosition=0
-	yPosition=0
-	width=1
-	height=1
-	pile={}
+	points=type PathPoints[]
+	pile=type Pile
+	effects=type Effect[]
 
-class TableTextArea
+class PathPoints
+	x=0
+	y=0
+	offsetRotation=0
+
+class LayoutTextArea
 	name=""
 	xPosition=0
 	yPosition=0
 	rotateAngle=0
 	text=""
-
-Class Rectangle
-	x=0
-	y=0
-	width=1
-	height=1
-	def ()
-
-	def make(X,Y,W,H)
-		x=X
-		y=Y
-		width=W
-		height=H
-		return this
